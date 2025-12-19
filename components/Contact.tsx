@@ -87,7 +87,7 @@ export function Contact() {
             Get In <span className="gradient-text">Touch</span>
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Have a project in mind or want to collaborate? I'd love to hear from you!
+            Have a project in mind or want to collaborate? I&apos;d love to hear from you!
           </p>
         </motion.div>
 

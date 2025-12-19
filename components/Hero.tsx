@@ -138,7 +138,7 @@ export function Hero() {
               variants={itemVariants}
               className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
             >
-              Hi, I'm{' '}
+              Hi, I&apos;m{' '}
               <span className="gradient-text">{profile.name}</span>
             </motion.h1>
 
@@ -146,7 +146,7 @@ export function Hero() {
               variants={itemVariants}
               className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4 h-12"
             >
-              <span className="text-gray-700 dark:text-gray-300">I'm a </span>
+              <span className="text-gray-700 dark:text-gray-300">I&apos;m a </span>
               <span className="text-primary-600 dark:text-primary-400">
                 {displayText}
                 <span className="animate-pulse">|</span>

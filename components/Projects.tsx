@@ -77,7 +77,7 @@ export function Projects() {
             My <span className="gradient-text">Projects</span>
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            A collection of projects I've worked on, showcasing my skills and experience
+            A collection of projects I&apos;ve worked on, showcasing my skills and experience
           </p>
         </motion.div>
 
