@@ -17,7 +17,7 @@ const firaCode = Fira_Code({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://yourname.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://deshith-deemantha.vercel.app'),
   title: {
     default: `${profile.name} - ${profile.title} | Portfolio`,
     template: `%s | ${profile.name}`,
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://yourname.vercel.app',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://deshith-deemantha.vercel.app',
     title: `${profile.name} - ${profile.title} Portfolio`,
     description: profile.bio,
     siteName: `${profile.name} Portfolio`,
@@ -72,10 +72,10 @@ export const metadata: Metadata = {
     images: ['/og-image.jpg'],
   },
   verification: {
-    google: process.env.GOOGLE_VERIFICATION_CODE || '',
+    google: process.env.GOOGLE_VERIFICATION_CODE || 'L6qegcjmde_AXEp1EP1WUah6nEhlYx2qIzFZ9iSIKS4',
   },
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL || 'https://yourname.vercel.app',
+    canonical: process.env.NEXT_PUBLIC_SITE_URL || 'https://deshith-deemantha.vercel.app',
   },
 }
 

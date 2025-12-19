@@ -6,8 +6,8 @@ export function StructuredData() {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: profile.name,
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://yourname.vercel.app',
-    image: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourname.vercel.app'}/profile.jpg`,
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://deshith-deemantha.vercel.app',
+    image: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://deshith-deemantha.vercel.app'}/profile.jpg`,
     jobTitle: profile.title,
     description: profile.bio,
     sameAs: profile.socialLinks
