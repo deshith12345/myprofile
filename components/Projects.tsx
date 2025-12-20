@@ -87,19 +87,18 @@ export function Projects() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-12"
+          className="flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-4 mb-12"
         >
           {/* Filters */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap justify-center gap-2">
             {filters.map((filterOption) => (
               <button
                 key={filterOption.value}
                 onClick={() => setFilter(filterOption.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  filter === filterOption.value
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${filter === filterOption.value
                     ? 'bg-primary-600 text-white'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
+                  }`}
               >
                 {filterOption.label}
               </button>

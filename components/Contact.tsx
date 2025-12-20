@@ -83,10 +83,10 @@ export function Contact() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-4">
             Get In <span className="gradient-text">Touch</span>
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Have a project in mind or want to collaborate? I&apos;d love to hear from you!
           </p>
         </motion.div>
@@ -100,7 +100,7 @@ export function Contact() {
             transition={{ duration: 0.5 }}
           >
             <Card>
-              <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
+              <h3 className="text-xl sm:text-2xl font-bold mb-6">Contact Information</h3>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
@@ -160,8 +160,8 @@ export function Contact() {
             transition={{ duration: 0.5 }}
           >
             <Card>
-              <h3 className="text-2xl font-bold mb-6">Send a Message</h3>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <h3 className="text-xl sm:text-2xl font-bold mb-6">Send a Message</h3>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
                 {/* Honeypot field (hidden) */}
                 <input
                   type="text"
@@ -175,7 +175,7 @@ export function Contact() {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+                    className="block text-xs sm:text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
                   >
                     Name *
                   </label>
@@ -183,7 +183,7 @@ export function Contact() {
                     id="name"
                     type="text"
                     {...register('name')}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.name && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -196,7 +196,7 @@ export function Contact() {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+                    className="block text-xs sm:text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
                   >
                     Email *
                   </label>
@@ -204,7 +204,7 @@ export function Contact() {
                     id="email"
                     type="email"
                     {...register('email')}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.email && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -217,7 +217,7 @@ export function Contact() {
                 <div>
                   <label
                     htmlFor="subject"
-                    className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+                    className="block text-xs sm:text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
                   >
                     Subject *
                   </label>
@@ -225,7 +225,7 @@ export function Contact() {
                     id="subject"
                     type="text"
                     {...register('subject')}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.subject && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -238,7 +238,7 @@ export function Contact() {
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+                    className="block text-xs sm:text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
                   >
                     Message *
                   </label>
@@ -246,7 +246,7 @@ export function Contact() {
                     id="message"
                     rows={6}
                     {...register('message')}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                   />
                   {errors.message && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -258,11 +258,10 @@ export function Contact() {
                 {/* Submit Status */}
                 {submitStatus.type && (
                   <div
-                    className={`p-4 rounded-lg flex items-start gap-3 ${
-                      submitStatus.type === 'success'
-                        ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
-                        : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-                    }`}
+                    className={`p-4 rounded-lg flex items-start gap-3 ${submitStatus.type === 'success'
+                      ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                      : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                      }`}
                   >
                     {submitStatus.type === 'success' ? (
                       <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />

@@ -85,11 +85,11 @@ export function Hero() {
     >
       {/* Animated Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 -z-10" />
-      
+
       {/* Particle Effect Background */}
       {isClient && (
         <div className="absolute inset-0 -z-10">
-          {[...Array(50)].map((_, i) => (
+          {[...Array(typeof window !== 'undefined' && window.innerWidth < 768 ? 20 : 50)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-primary-400 dark:bg-primary-600 rounded-full opacity-30"
@@ -136,7 +136,7 @@ export function Hero() {
 
             <motion.h1
               variants={itemVariants}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight"
             >
               Hi, I&apos;m{' '}
               <span className="gradient-text">{profile.name}</span>
@@ -144,7 +144,7 @@ export function Hero() {
 
             <motion.div
               variants={itemVariants}
-              className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4 h-12"
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-4 h-10 sm:h-12"
             >
               <span className="text-gray-700 dark:text-gray-300">I&apos;m a </span>
               <span className="text-primary-600 dark:text-primary-400">
@@ -155,14 +155,14 @@ export function Hero() {
 
             <motion.p
               variants={itemVariants}
-              className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl"
+              className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-6 max-w-2xl"
             >
               {profile.tagline}
             </motion.p>
 
             <motion.p
               variants={itemVariants}
-              className="text-base text-gray-600 dark:text-gray-400 mb-8 max-w-2xl"
+              className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 max-w-2xl"
             >
               {profile.bio}
             </motion.p>
@@ -170,7 +170,7 @@ export function Hero() {
             {/* CTA Buttons */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-4 mb-8"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8"
             >
               <Button
                 size="lg"
@@ -228,7 +228,7 @@ export function Hero() {
             className="flex justify-center lg:justify-end"
           >
             <motion.div
-              className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96"
+              className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96"
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >

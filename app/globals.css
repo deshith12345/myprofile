@@ -8,13 +8,24 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300;
     font-family: var(--font-inter);
+    overflow-x: hidden;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
-  html {
-    scroll-behavior: smooth;
+  /* Ensure main content doesn't overflow on mobile */
+  main {
+    overflow-x: hidden;
+    width: 100%;
   }
 }
 
