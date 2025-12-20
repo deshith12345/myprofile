@@ -9,16 +9,17 @@ import { Badge } from '@/components/ui/Badge'
 import { achievements } from '@/data/achievements'
 import { formatDate } from '@/lib/utils'
 import { CertificateModal } from './CertificateModal'
-import type { Achievement } from '@/data/achievements'
+import type { Achievement, AchievementCategory } from '@/data/achievements'
+import { LucideIcon } from 'lucide-react'
 
-const categoryIcons = {
+const categoryIcons: Record<AchievementCategory, LucideIcon> = {
   award: Trophy,
   certification: Award,
   publication: BookOpen,
   speaking: Mic,
 }
 
-const categoryLabels = {
+const categoryLabels: Record<AchievementCategory, string> = {
   award: 'Award',
   certification: 'Certification',
   publication: 'Publication',
@@ -96,9 +97,8 @@ export function Achievements() {
                   {/* Certificate Image */}
                   {achievement.certificateFile && (
                     <div
-                      className={`relative w-full h-48 rounded-t-xl overflow-hidden mb-4 ${
-                        achievement.certificateFile ? 'cursor-pointer' : ''
-                      }`}
+                      className={`relative w-full h-48 rounded-t-xl overflow-hidden mb-4 ${achievement.certificateFile ? 'cursor-pointer' : ''
+                        }`}
                       onClick={() => handleCertificateClick(achievement)}
                     >
                       {isImage ? (
