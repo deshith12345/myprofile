@@ -7,8 +7,8 @@ export async function POST(request: Request) {
         const { username, password } = await request.json()
 
         // Retrieve credentials from environment variables
-        const adminUser = process.env.ADMIN_USERNAME || 'admin'
-        const adminPass = process.env.ADMIN_PASSWORD || 'password123'
+        const adminUser = process.env.ADMIN_USERNAME || 'netripper'
+        const adminPass = process.env.ADMIN_PASSWORD || 'Netripper12@#'
 
         if (username === adminUser && password === adminPass) {
             // Create a session
