@@ -28,7 +28,7 @@ export async function sendEmail(data: EmailData): Promise<{ success: boolean; er
       },
       body: JSON.stringify({
         from: 'Portfolio Contact <onboarding@resend.dev>', // Replace with your verified domain
-        to: process.env.CONTACT_EMAIL || 'your.email@example.com',
+        to: process.env.CONTACT_EMAIL || 'deemanthadeshith@gmail.com',
         replyTo: data.email,
         subject: `Portfolio Contact: ${data.subject}`,
         html: `
