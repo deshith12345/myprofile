@@ -1,23 +1,24 @@
 // Personal profile data - Edit this file to customize your portfolio
 export const profile = {
   name: 'Deshith Deemantha',
-  title: 'Cybersecurity enthusiast',
-  tagline: 'Building modern web applications with passion and precision',
-  bio: `I'm a passionate full-stack developer with expertise in building modern web applications. 
-  With years of experience in React, Node.js, and cloud technologies, I create scalable and 
-  maintainable solutions that deliver exceptional user experiences.`,
+  title: 'Cybersecurity Student & Security Analyst',
+  tagline: 'Protecting digital assets through threat analysis and security best practices',
+  bio: `I'm a dedicated cybersecurity student with a passion for protecting systems and data. 
+  Specialized in threat analysis, network security, and penetration testing, I work to identify 
+  vulnerabilities and implement robust security solutions.`,
 
-  longBio: `I'm a passionate full-stack developer with expertise in building modern web applications. 
-  With years of experience in React, Node.js, and cloud technologies, I create scalable and 
-  maintainable solutions that deliver exceptional user experiences.
+  longBio: `I'm a dedicated cybersecurity student with a passion for protecting systems and data 
+  from evolving threats. With extensive training in security operations, threat landscape analysis, 
+  and cloud security, I focus on identifying vulnerabilities and implementing comprehensive defense strategies.
 
-  My journey in software development began with a curiosity about how things work behind the scenes. 
-  Over the years, I've honed my skills in both frontend and backend development, always staying 
-  updated with the latest technologies and best practices.
+  My journey in cybersecurity began with a fascination for how systems can be secured and protected. 
+  Through numerous certifications including ISC2 domains, IBM Cloud Security, and Splunk fundamentals, 
+  I've developed strong skills in threat intelligence, incident response, and security governance.
 
-  When I'm not coding, I enjoy contributing to open-source projects, writing technical blog posts, 
-  and sharing knowledge with the developer community. I believe in writing clean, maintainable code 
-  and following best practices to build applications that stand the test of time.`,
+  I specialize in using industry-standard tools like Wireshark, Metasploit, Nmap, and Burp Suite for 
+  security assessments. When I'm not hunting for vulnerabilities, I enjoy staying updated with the latest 
+  security trends, analyzing threat reports, and contributing to the cybersecurity community through 
+  knowledge sharing and best practices.`,
 
   location: 'kandy, Sri Lanka',
   timezone: 'PST (UTC-8)',
@@ -48,9 +49,9 @@ export const profile = {
   ],
 
   stats: {
-    yearsOfExperience: 5,
-    projectsCompleted: 50,
-    happyClients: 30,
-    githubContributions: 1000,
+    certifications: 20,
+    securityAssessments: 15,
+    vulnerabilitiesFound: 50,
+    toolsMastered: 25,
   },
 }

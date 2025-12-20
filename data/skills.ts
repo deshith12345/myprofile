@@ -1,42 +1,28 @@
-// Skills data - Edit this to reflect your actual skills
+// Skills data - Focused on core cybersecurity and development
 export interface Skill {
   name: string
-  category: 'frontend' | 'backend' | 'tools' | 'soft'
+  category: 'security-tools' | 'programming'
   proficiency: number // 1-100
-  icon?: string
+  icon?: string // Lucide icon name or Simple Icon slug
+  isBrandIcon?: boolean
+  brandColor?: string
 }
 
 export const skills: Skill[] = [
-  // Frontend Skills
-  { name: 'React', category: 'frontend', proficiency: 95, icon: 'react' },
-  { name: 'Next.js', category: 'frontend', proficiency: 90, icon: 'nextjs' },
-  { name: 'TypeScript', category: 'frontend', proficiency: 92, icon: 'typescript' },
-  { name: 'JavaScript', category: 'frontend', proficiency: 95, icon: 'javascript' },
-  { name: 'HTML/CSS', category: 'frontend', proficiency: 98, icon: 'html' },
-  { name: 'Tailwind CSS', category: 'frontend', proficiency: 90, icon: 'tailwind' },
-  { name: 'Framer Motion', category: 'frontend', proficiency: 85, icon: 'framer' },
-  
-  // Backend Skills
-  { name: 'Node.js', category: 'backend', proficiency: 88, icon: 'nodejs' },
-  { name: 'Express', category: 'backend', proficiency: 85, icon: 'express' },
-  { name: 'Python', category: 'backend', proficiency: 80, icon: 'python' },
-  { name: 'PostgreSQL', category: 'backend', proficiency: 82, icon: 'postgresql' },
-  { name: 'MongoDB', category: 'backend', proficiency: 85, icon: 'mongodb' },
-  { name: 'GraphQL', category: 'backend', proficiency: 78, icon: 'graphql' },
-  { name: 'REST APIs', category: 'backend', proficiency: 92, icon: 'api' },
-  
-  // Tools
-  { name: 'Git', category: 'tools', proficiency: 95, icon: 'git' },
-  { name: 'Docker', category: 'tools', proficiency: 80, icon: 'docker' },
-  { name: 'AWS', category: 'tools', proficiency: 75, icon: 'aws' },
-  { name: 'Vercel', category: 'tools', proficiency: 90, icon: 'vercel' },
-  { name: 'CI/CD', category: 'tools', proficiency: 85, icon: 'cicd' },
-  { name: 'VS Code', category: 'tools', proficiency: 95, icon: 'vscode' },
-  
-  // Soft Skills
-  { name: 'Problem Solving', category: 'soft', proficiency: 95 },
-  { name: 'Team Collaboration', category: 'soft', proficiency: 90 },
-  { name: 'Communication', category: 'soft', proficiency: 88 },
-  { name: 'Project Management', category: 'soft', proficiency: 85 },
-  { name: 'Mentoring', category: 'soft', proficiency: 80 },
+  // Security Tools (The Security Stack)
+  { name: 'Wireshark', category: 'security-tools', proficiency: 85, icon: 'wireshark', isBrandIcon: true, brandColor: '1679A7' },
+  { name: 'Metasploit', category: 'security-tools', proficiency: 80, icon: 'metasploit', isBrandIcon: true, brandColor: '246EB9' },
+  { name: 'Nmap', category: 'security-tools', proficiency: 90, icon: 'target', isBrandIcon: false },
+  { name: 'Burp Suite', category: 'security-tools', proficiency: 82, icon: 'burpsuite', isBrandIcon: true, brandColor: 'FF6633' },
+  { name: 'Splunk', category: 'security-tools', proficiency: 85, icon: 'splunk', isBrandIcon: true, brandColor: '000000' },
+  { name: 'Kali Linux', category: 'security-tools', proficiency: 88, icon: 'kalilinux', isBrandIcon: true, brandColor: '557C94' },
+  { name: 'Nessus', category: 'security-tools', proficiency: 78, icon: 'shield-alert', isBrandIcon: false },
+
+  // Programming & Scripting (Dev & Scripting)
+  { name: 'Python', category: 'programming', proficiency: 90, icon: 'python', isBrandIcon: true, brandColor: '3776AB' },
+  { name: 'Bash', category: 'programming', proficiency: 85, icon: 'gnubash', isBrandIcon: true, brandColor: '4EAA25' },
+  { name: 'PowerShell', category: 'programming', proficiency: 80, icon: 'powershell', isBrandIcon: true, brandColor: '5391FE' },
+  { name: 'JavaScript', category: 'programming', proficiency: 75, icon: 'javascript', isBrandIcon: true, brandColor: 'F7DF1E' },
+  { name: 'SQL', category: 'programming', proficiency: 82, icon: 'database', isBrandIcon: false },
+  { name: 'Git', category: 'programming', proficiency: 88, icon: 'git', isBrandIcon: true, brandColor: 'F05032' },
 ]

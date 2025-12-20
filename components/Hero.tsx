@@ -8,7 +8,7 @@ import { profile } from '@/data/profile'
 import { scrollToElement } from '@/lib/utils'
 import Image from 'next/image'
 
-const roles = ['Full Stack Developer', 'React Specialist', 'Problem Solver', 'Code Enthusiast']
+const roles = ['Cybersecurity Student', 'Security Analyst', 'Penetration Tester', 'Threat Hunter']
 
 export function Hero() {
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
