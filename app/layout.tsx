@@ -77,6 +77,21 @@ export const metadata: Metadata = {
   alternates: {
     canonical: process.env.NEXT_PUBLIC_SITE_URL || 'https://deshith-deemantha.vercel.app',
   },
+  icons: {
+    icon: [
+      { url: '/D.jpg', type: 'image/jpeg' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/D.jpg', sizes: '180x180', type: 'image/jpeg' },
+    ],
+    other: [
+      {
+        rel: 'icon',
+        url: '/D.jpg',
+      },
+    ],
+  },
 }
 
 export default function RootLayout({
