@@ -110,5 +110,13 @@ export const skills: Skill[] = [
     "icon": "cplusplus",
     "isBrandIcon": true,
     "brandColor": "00599C"
+  },
+  {
+    "name": "microsoft powershell",
+    "category": "security-tools",
+    "proficiency": 50,
+    "icon": "microsoftpowershell",
+    "isBrandIcon": true,
+    "brandColor": "666666"
   }
 ]
