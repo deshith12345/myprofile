@@ -3,5 +3,4 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "ignoreBuildStep": "git log -1 --pretty=%B | grep -q '\\[skip ci\\]'"
 }
