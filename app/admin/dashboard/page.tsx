@@ -27,9 +27,10 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { profile } from '@/data/profile'
-import { skills as skillsData, Skill } from '@/data/skills'
-import { projects as projectsData, Project } from '@/data/projects'
-import { achievements as achievementsData, Achievement } from '@/data/achievements'
+import { skills as skillsData } from '@/data/skills'
+import { projects as projectsData } from '@/data/projects'
+import { achievements as achievementsData } from '@/data/achievements'
+import { Skill, Project, Achievement, Profile } from '@/data/types'
 import { findBrandIcon } from '@/lib/icon-utils'
 
 type Tab = 'profile' | 'skills' | 'projects' | 'achievements'
@@ -162,10 +163,10 @@ export default function AdminDashboard() {
     const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string, url?: string | null } | null>(null)
 
     const [isLoadingData, setIsLoadingData] = useState(true)
-    const [localProfile, setLocalProfile] = useState(profile)
-    const [localSkills, setLocalSkills] = useState([...skillsData])
-    const [localProjects, setLocalProjects] = useState([...projectsData])
-    const [localAchievements, setLocalAchievements] = useState([...achievementsData])
+    const [localProfile, setLocalProfile] = useState<Profile>(profile as Profile)
+    const [localSkills, setLocalSkills] = useState<Skill[]>([...(skillsData as unknown as Skill[])])
+    const [localProjects, setLocalProjects] = useState<Project[]>([...(projectsData as unknown as Project[])])
+    const [localAchievements, setLocalAchievements] = useState<Achievement[]>([...(achievementsData as unknown as Achievement[])])
     useEffect(() => {
         const fetchAllData = async () => {
             try {
@@ -479,7 +480,7 @@ export default function AdminDashboard() {
                                                     type="text"
                                                     value={role}
                                                     onChange={(e) => {
-                                                        const updatedRoles = [...localProfile.roles]
+                                                        const updatedRoles = [...(localProfile.roles || [])]
                                                         updatedRoles[ridx] = e.target.value
                                                         setLocalProfile({ ...localProfile, roles: updatedRoles })
                                                     }}
@@ -487,7 +488,7 @@ export default function AdminDashboard() {
                                                 />
                                                 <button
                                                     onClick={() => {
-                                                        const updatedRoles = localProfile.roles.filter((_: any, i: number) => i !== ridx)
+                                                        const updatedRoles = (localProfile.roles || []).filter((_: any, i: number) => i !== ridx)
                                                         setLocalProfile({ ...localProfile, roles: updatedRoles })
                                                     }}
                                                     className="p-2 text-red-500/50 hover:text-red-500 transition-colors"
@@ -511,8 +512,9 @@ export default function AdminDashboard() {
                                             category: 'security-tools',
                                             proficiency: 50,
                                             icon: 'shield',
-                                            isBrandIcon: false
-                                        }
+                                            isBrandIcon: false,
+                                            brandColor: undefined
+                                        } as Skill
                                         setLocalSkills([...localSkills, newSkill])
                                     }} className="bg-primary-600 hover:bg-primary-500 text-white rounded-xl">
                                         <Plus className="w-4 h-4 mr-2" /> Unsheathe New Skill

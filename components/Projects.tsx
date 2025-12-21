@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/Badge'
 
 type Filter = 'all' | 'web' | 'mobile' | 'opensource' | 'other'
 type Sort = 'latest' | 'popular' | 'featured'
-import { Project } from '@/data/projects'
+import { Project } from '@/data/types'
 
 export function Projects({ projects: projectsData }: { projects: Project[] }) {
   const [filter, setFilter] = useState<Filter>('all')

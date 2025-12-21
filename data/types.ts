@@ -27,14 +27,19 @@ export interface Achievement {
   description: string;
   icon: string;
   verificationUrl?: string;
-  category: 'award' | 'certification' | 'publication' | 'speaking';
+  certificateFile?: string;
+  category: AchievementCategory;
 }
+
+export type AchievementCategory = 'award' | 'certification' | 'publication' | 'speaking';
 
 export interface Skill {
   name: string;
-  category: 'frontend' | 'backend' | 'tools' | 'soft';
+  category: 'frontend' | 'backend' | 'tools' | 'soft' | 'security-tools' | 'programming';
   proficiency: number; // 1-100
   icon?: string;
+  isBrandIcon?: boolean;
+  brandColor?: string;
 }
 
 export interface SocialLink {

@@ -7,7 +7,7 @@ import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { Project } from '@/data/projects'
+import { Project } from '@/data/types'
 
 interface ProjectCardProps {
   project: Project
@@ -114,7 +114,7 @@ export function ProjectCard({ project, onClick, priority = false }: ProjectCardP
 
           {/* Overlay Gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
-          
+
           {/* View Details Hint */}
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white opacity-0 hover:opacity-100 transition-opacity duration-300 text-sm font-medium">
             Click to view details
@@ -126,7 +126,7 @@ export function ProjectCard({ project, onClick, priority = false }: ProjectCardP
           <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
             {project.title}
           </h3>
-          
+
           <p className="text-gray-600 dark:text-gray-300 mb-4 flex-1 line-clamp-3">
             {project.description}
           </p>
@@ -167,7 +167,7 @@ export function ProjectCard({ project, onClick, priority = false }: ProjectCardP
                 <span className="truncate">Live Demo</span>
               </Button>
             )}
-            
+
             {project.githubUrl && (
               <Button
                 size="sm"
@@ -181,7 +181,7 @@ export function ProjectCard({ project, onClick, priority = false }: ProjectCardP
                 <span className="truncate">Code</span>
               </Button>
             )}
-            
+
             <Button
               size="sm"
               variant="ghost"

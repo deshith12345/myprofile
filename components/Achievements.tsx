@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { formatDate } from '@/lib/utils'
 import { CertificateModal } from './CertificateModal'
-import type { Achievement, AchievementCategory } from '@/data/achievements'
+import type { Achievement, AchievementCategory } from '@/data/types'
 import { LucideIcon } from 'lucide-react'
 
 const categoryIcons: Record<AchievementCategory, LucideIcon> = {

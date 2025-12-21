@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Download, ExternalLink, FileText, Loader2 } from 'lucide-react'
 import Image from 'next/image'
-import { Achievement } from '@/data/achievements'
+import { Achievement } from '@/data/types'
 
 interface CertificateModalProps {
   achievement: Achievement | null
@@ -22,12 +22,12 @@ export function CertificateModal({ achievement, isOpen, onClose }: CertificateMo
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
-    
+
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
     }
-    
+
     return () => {
       document.removeEventListener('keydown', handleEscape)
       document.body.style.overflow = 'unset'
@@ -63,7 +63,7 @@ export function CertificateModal({ achievement, isOpen, onClose }: CertificateMo
   const isImage = !isPDF
 
   // Add error boundary for PDF URLs
-  const sanitizedPdfUrl = isPDF 
+  const sanitizedPdfUrl = isPDF
     ? `${achievement.certificateFile}#toolbar=1&navpanes=0&scrollbar=1&zoom=page-width`
     : ''
 

@@ -1,4 +1,6 @@
-export const profile = {
+import { Profile } from './types'
+
+export const profile: Profile = {
   "name": "Deshith Deemantha ",
   "title": "Cybersecurity Student & Security Analyst",
   "tagline": "Protecting digital assets through threat analysis and security best practices",

@@ -15,7 +15,7 @@ import {
   GitBranch,
   Command
 } from 'lucide-react'
-import { Skill } from '@/data/skills'
+import { Skill } from '@/data/types'
 
 const iconMap: { [key: string]: any } = {
   'activity': Activity,
