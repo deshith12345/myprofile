@@ -35,7 +35,8 @@ export async function POST(request: Request) {
         // Sanitize filename
         const sanitizedName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase()
         const fileName = `${Date.now()}_${sanitizedName}`
-        const relativePath = `public/images/projects/${fileName}`
+        const storagePath = `public/images/projects/${fileName}`
+        const publicUrl = `/images/projects/${fileName}`
         const uploadDir = path.join(process.cwd(), 'public', 'images', 'projects')
         const filePath = path.join(uploadDir, fileName)
 
@@ -56,13 +57,34 @@ export async function POST(request: Request) {
                 const repoPath = process.env.GITHUB_REPO.replace(/^https:\/\/github\.com\//, '').replace(/\.git$/, '')
                 const [owner, repo] = repoPath.split('/')
 
+                if (!owner || !repo) {
+                    throw new Error(`Invalid GITHUB_REPO format: "${process.env.GITHUB_REPO}". Expected "owner/repo"`)
+                }
+
+                // Get existing file SHA if it exists (to prevent collisions/conflicts)
+                let currentSha: string | undefined
+                try {
+                    const { data: existingFile } = await octokit.rest.repos.getContent({
+                        owner,
+                        repo,
+                        path: storagePath,
+                        ref: 'main'
+                    })
+                    if (!Array.isArray(existingFile)) {
+                        currentSha = existingFile.sha
+                    }
+                } catch (e) {
+                    // File doesn't exist yet, which is fine
+                }
+
                 await octokit.rest.repos.createOrUpdateFileContents({
                     owner,
                     repo,
-                    path: relativePath,
+                    path: storagePath,
                     branch: 'main',
                     message: `Admin Hub: Upload asset ${fileName}`,
                     content: buffer.toString('base64'),
+                    sha: currentSha,
                     committer: {
                         name: 'Deshith Deemantha',
                         email: 'deemanthadeshith@gmail.com',
@@ -73,7 +95,7 @@ export async function POST(request: Request) {
                     },
                 })
                 githubUploadSuccess = true
-                console.log(`GitHub Asset Sync Success: ${relativePath}`)
+                console.log(`GitHub Asset Sync Success: ${storagePath}`)
             } catch (githubError: any) {
                 console.error('GitHub Asset Sync Error:', githubError)
                 // If local write also failed, then we have a real problem
@@ -92,8 +114,8 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             success: true,
-            message: githubUploadSuccess ? 'Asset persistent on GitHub.' : 'Asset saved locally.',
-            url: `/${relativePath}`
+            message: githubUploadSuccess ? 'Asset persistent on GitHub. Deployment triggered.' : 'Asset saved locally.',
+            url: publicUrl
         })
     } catch (error) {
         console.error('Upload Error:', error)

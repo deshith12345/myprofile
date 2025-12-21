@@ -37,11 +37,17 @@ type Tab = 'profile' | 'skills' | 'projects' | 'achievements'
 function DropZone({ onUpload, currentFile, accept = 'image/*' }: { onUpload: (url: string) => void, currentFile?: string, accept?: string }) {
     const [isDragging, setIsDragging] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const handleFile = async (file: File) => {
-        setIsUploading(true)
+        // Create immediate local preview
+        if (file.type.startsWith('image/')) {
+            const localUrl = URL.createObjectURL(file)
+            setPreviewUrl(localUrl)
+        }
 
+        setIsUploading(true)
         const formData = new FormData()
         formData.append('file', file)
 
@@ -53,15 +59,22 @@ function DropZone({ onUpload, currentFile, accept = 'image/*' }: { onUpload: (ur
             const data = await res.json()
             if (data.success) {
                 onUpload(data.url)
+                setPreviewUrl(null) // Clear local preview once server URL is back
+            } else {
+                alert(`Upload failed: ${data.message}`)
+                setPreviewUrl(null)
             }
         } catch (err) {
             console.error('Upload failed:', err)
+            alert('Upload failed: Network error.')
+            setPreviewUrl(null)
         } finally {
             setIsUploading(false)
         }
     }
 
-    const isImage = currentFile?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+    const displayUrl = previewUrl || currentFile
+    const isImage = displayUrl?.match(/\.(jpg|jpeg|png|gif|webp|blob:)/i) || previewUrl
 
     return (
         <div
@@ -87,14 +100,14 @@ function DropZone({ onUpload, currentFile, accept = 'image/*' }: { onUpload: (ur
                     if (file) handleFile(file)
                 }}
             />
-            {currentFile ? (
+            {displayUrl ? (
                 <>
                     {isImage ? (
-                        <img src={currentFile} alt="" className="w-full h-full object-cover" />
+                        <img src={displayUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-50 dark:bg-gray-800">
                             <FileText className="w-8 h-8 mb-2" />
-                            <span className="text-[10px] font-black uppercase tracking-widest truncate max-w-[80%]">{currentFile.split('/').pop()}</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest truncate max-w-[80%]">{displayUrl.split('/').pop()}</span>
                         </div>
                     )}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
