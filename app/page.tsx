@@ -8,6 +8,9 @@ import { Footer } from '@/components/Footer'
 import { StructuredData } from '@/components/StructuredData'
 import { getDb } from '@/lib/mongodb'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 // Fallback data
 import { profile as defaultProfile } from '@/data/profile'
 import { projects as defaultProjects } from '@/data/projects'
