@@ -1,3 +1,5 @@
+export type AchievementCategory = 'award' | 'certification' | 'publication' | 'speaking'
+
 export interface Achievement {
   id: string
   title: string
@@ -6,7 +8,7 @@ export interface Achievement {
   description: string
   icon: string
   verificationUrl?: string
-  category: string
+  category: AchievementCategory
   certificateFile?: string
 }
 
