@@ -66,10 +66,11 @@ function SkillCard({ skill }: { skill: Skill }) {
         </div>
         <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
           <motion.div
-            initial={{ width: 0 }}
-            whileInView={{ width: `${skill.proficiency}%` }}
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: skill.proficiency / 100 }}
             transition={{ duration: 1.5, ease: "circOut" }}
-            className="h-full bg-gradient-to-r from-primary-500 to-secondary-500"
+            viewport={{ once: true }}
+            className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 origin-left will-change-transform"
           />
         </div>
       </div>

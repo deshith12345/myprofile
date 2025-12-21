@@ -19,8 +19,8 @@ export async function POST(request: Request) {
         }
 
         // Basic validation
-        if (!file.type.startsWith('image/')) {
-            return NextResponse.json({ success: false, message: 'Invalid file type. Only images are allowed.' }, { status: 400 })
+        if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+            return NextResponse.json({ success: false, message: 'Invalid file type. Only images and PDFs are allowed.' }, { status: 400 })
         }
 
         // Limit size to 5MB
@@ -49,7 +49,8 @@ export async function POST(request: Request) {
 
         // 2. Local storage fallback (for dev/local persist)
         try {
-            const uploadDir = path.join(process.cwd(), 'public', 'images', 'projects')
+            const isPdf = file.type === 'application/pdf'
+            const uploadDir = path.join(process.cwd(), 'public', isPdf ? 'CV' : 'images/projects')
             await fs.mkdir(uploadDir, { recursive: true })
             const filePath = path.join(uploadDir, fileName)
             await fs.writeFile(filePath, buffer)

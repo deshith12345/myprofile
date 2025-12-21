@@ -417,13 +417,15 @@ export default function AdminDashboard() {
                                         />
                                     </div>
                                     <div className="space-y-3">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Resume Path (/CV/resume.pdf)</label>
-                                        <input
-                                            type="text"
-                                            value={localProfile.resume}
-                                            onChange={(e) => setLocalProfile({ ...localProfile, resume: e.target.value })}
-                                            className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 text-sm font-bold focus:ring-1 focus:ring-primary-500 outline-none transition-all"
-                                        />
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Resume / CV (PDF)</label>
+                                        <div className="max-w-[300px]">
+                                            <DropZone
+                                                currentFile={localProfile.resume}
+                                                accept="application/pdf"
+                                                aspect="video"
+                                                onUpload={(url) => setLocalProfile(prev => ({ ...prev, resume: url }))}
+                                            />
+                                        </div>
                                     </div>
                                     <div className="space-y-3">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Location</label>
