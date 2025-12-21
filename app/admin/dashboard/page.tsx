@@ -20,7 +20,8 @@ import {
     Link as LinkIcon,
     Upload,
     X,
-    FileText
+    FileText,
+    Wand2
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
@@ -29,6 +30,7 @@ import { profile } from '@/data/profile'
 import { skills as skillsData, Skill } from '@/data/skills'
 import { projects as projectsData, Project } from '@/data/projects'
 import { achievements as achievementsData, Achievement } from '@/data/achievements'
+import { findBrandIcon } from '@/lib/icon-utils'
 
 type Tab = 'profile' | 'skills' | 'projects' | 'achievements'
 
@@ -343,17 +345,49 @@ export default function AdminDashboard() {
                                     {localSkills.map((skill, idx) => (
                                         <div key={idx} className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 group relative">
                                             <div className="grid md:grid-cols-4 gap-4 items-center">
-                                                <div className="md:col-span-1 space-y-1">
-                                                    <label className="text-[8px] font-black uppercase text-gray-500">Skill Name</label>
-                                                    <input
-                                                        value={skill.name}
-                                                        onChange={(e) => {
-                                                            const updated = [...localSkills]
-                                                            updated[idx].name = e.target.value
-                                                            setLocalSkills(updated)
-                                                        }}
-                                                        className="w-full bg-transparent border-none p-0 text-sm font-bold text-gray-900 dark:text-white outline-none focus:ring-0"
-                                                    />
+                                                <div className="md:col-span-1 flex items-center gap-4">
+                                                    <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden">
+                                                        {skill.isBrandIcon && skill.icon ? (
+                                                            <img
+                                                                src={`https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}`}
+                                                                alt=""
+                                                                className="w-full h-full object-contain"
+                                                                onError={(e) => {
+                                                                    e.currentTarget.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div className="text-gray-400 text-[8px] font-black uppercase text-center leading-tight">No<br />Icon</div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 space-y-1">
+                                                        <label className="text-[8px] font-black uppercase text-gray-500">Skill Name</label>
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                value={skill.name}
+                                                                onChange={(e) => {
+                                                                    const updated = [...localSkills]
+                                                                    updated[idx].name = e.target.value
+                                                                    setLocalSkills(updated)
+                                                                }}
+                                                                className="w-full bg-transparent border-none p-0 text-sm font-bold text-gray-900 dark:text-white outline-none focus:ring-0"
+                                                            />
+                                                            <button
+                                                                title="Auto-detect Icon"
+                                                                onClick={() => {
+                                                                    const iconData = findBrandIcon(skill.name);
+                                                                    const updated = [...localSkills];
+                                                                    updated[idx].icon = iconData.slug;
+                                                                    updated[idx].brandColor = iconData.color;
+                                                                    updated[idx].isBrandIcon = true;
+                                                                    setLocalSkills(updated);
+                                                                }}
+                                                                className="p-1 hover:text-primary-500 transition-colors"
+                                                            >
+                                                                <Wand2 className="w-3 h-3" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div className="md:col-span-1 space-y-1">
                                                     <label className="text-[8px] font-black uppercase text-gray-500">Category</label>
@@ -677,6 +711,6 @@ export default function AdminDashboard() {
                     </motion.div>
                 </Card>
             </main>
-        </div>
+        </div >
     )
 }
