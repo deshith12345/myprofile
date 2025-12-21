@@ -238,12 +238,13 @@ export default function AdminDashboard() {
                         <div>
                             <h4 className="text-sm font-black uppercase tracking-widest text-amber-900 dark:text-amber-400 mb-2">Immutable Deployment Notice</h4>
                             <p className="text-sm text-amber-800 dark:text-amber-300/80 leading-relaxed">
-                                You are currently connected to the <strong>Vercel Production Edge</strong>. Due to Vercel&apos;s security architecture, direct file writes are transient and <strong>will not persist</strong> after the server restarts.
+                                You are currently connected to the <strong>Vercel Production Edge</strong>. Direct file writes are transient by default.
+                                <strong> To enable persistent updates:</strong> Add <code>GITHUB_TOKEN</code> and <code>GITHUB_REPO</code> to your Vercel Environment Variables.
                             </p>
                             <div className="mt-4 flex flex-wrap gap-4">
                                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tighter text-amber-700 dark:text-amber-500">
                                     <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                                    Persistent Workflow: Edit Locally → Push to GitHub
+                                    Feature Enabled: GitHub Auto-Sync & Redeploy
                                 </div>
                             </div>
                         </div>

@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import fs from 'fs/promises'
 import path from 'path'
+import { Octokit } from 'octokit'
+
+const octokit = process.env.GITHUB_TOKEN ? new Octokit({ auth: process.env.GITHUB_TOKEN }) : null
 
 export async function POST(request: Request) {
     try {
@@ -37,17 +40,78 @@ export async function POST(request: Request) {
                 return NextResponse.json({ success: false, message: 'Invalid data type' }, { status: 400 })
         }
 
+        // 1. Attempt local file update (works in local dev)
+        let localWriteSuccess = false
         try {
             await fs.writeFile(filePath, content, 'utf-8')
+            localWriteSuccess = true
         } catch (writeError: any) {
-            console.error('File System Write Error:', writeError)
+            console.warn('Local FS Write Failed (expected on Vercel):', writeError.message)
+        }
+
+        // 2. Attempt GitHub repository update (works in production if GITHUB_TOKEN is set)
+        let githubUpdateSuccess = false
+        if (octokit && process.env.GITHUB_REPO) {
+            try {
+                const [owner, repo] = process.env.GITHUB_REPO.split('/')
+                const relativePath = path.relative(process.cwd(), filePath).replace(/\\/g, '/')
+
+                // Get the current file SHA
+                let currentFileSha: string | undefined
+                try {
+                    const { data: currentFile } = await octokit.rest.repos.getContent({
+                        owner,
+                        repo,
+                        path: relativePath,
+                    })
+                    if (!Array.isArray(currentFile)) {
+                        currentFileSha = currentFile.sha
+                    }
+                } catch (getShaError) {
+                    console.warn(`File ${relativePath} not found on GitHub, creating new file.`)
+                }
+
+                // Update or create the file on GitHub
+                await octokit.rest.repos.createOrUpdateFileContents({
+                    owner,
+                    repo,
+                    path: relativePath,
+                    message: `Admin Hub: Update ${type} data`,
+                    content: Buffer.from(content).toString('base64'),
+                    sha: currentFileSha,
+                    committer: {
+                        name: 'Admin Dashboard',
+                        email: 'admin@portfolio.vercel.app',
+                    },
+                    author: {
+                        name: 'Admin Dashboard',
+                        email: 'admin@portfolio.vercel.app',
+                    },
+                })
+                githubUpdateSuccess = true
+            } catch (githubError: any) {
+                console.error('GitHub API Update Error:', githubError)
+                // If local write ALSO failed, then we have a problem
+                if (!localWriteSuccess) {
+                    return NextResponse.json({
+                        success: false,
+                        message: `Failed to update: GitHub API error (${githubError.status}). Check GITHUB_TOKEN permissions.`
+                    }, { status: 500 })
+                }
+            }
+        }
+
+        if (!localWriteSuccess && !githubUpdateSuccess) {
             return NextResponse.json({
                 success: false,
-                message: process.env.VERCEL ? 'Vercel filesystem is read-only. Please update locally and push.' : 'Failed to write to local data file.'
+                message: process.env.GITHUB_TOKEN ? 'Synchronization failed. Could not write to local FS or GitHub.' : 'Read-only environment. Please configure GITHUB_TOKEN to enable live updates.'
             }, { status: 500 })
         }
 
-        return NextResponse.json({ success: true, message: 'Data updated successfully' })
+        return NextResponse.json({
+            success: true,
+            message: githubUpdateSuccess ? 'Data synchronized to GitHub. Site will redeploy automatically.' : 'Data saved locally.'
+        })
     } catch (error) {
         console.error('Update Request Error:', error)
         return NextResponse.json({ success: false, message: 'Invalid synchronization request' }, { status: 500 })
