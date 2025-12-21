@@ -365,6 +365,17 @@ export default function AdminDashboard() {
                                                         <div className="flex items-center gap-2">
                                                             <input
                                                                 value={skill.name}
+                                                                onBlur={() => {
+                                                                    // Auto-detect icon if current icon is empty or default
+                                                                    if (!skill.icon || skill.icon === 'shield') {
+                                                                        const iconData = findBrandIcon(skill.name);
+                                                                        const updated = [...localSkills];
+                                                                        updated[idx].icon = iconData.slug;
+                                                                        updated[idx].brandColor = iconData.color;
+                                                                        updated[idx].isBrandIcon = true;
+                                                                        setLocalSkills(updated);
+                                                                    }
+                                                                }}
                                                                 onChange={(e) => {
                                                                     const updated = [...localSkills]
                                                                     updated[idx].name = e.target.value
