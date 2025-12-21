@@ -33,7 +33,7 @@ export async function POST(request: Request) {
                 break
             case 'achievements':
                 filePath = path.join(dataDir, 'achievements.ts')
-                content = `export interface Achievement {\n  id: string\n  title: string\n  organization: string\n  date: string\n  description: string\n  icon: string\n  verificationUrl?: string\n  category: string\n  certificateFile?: string\n}\n\nexport const achievements: Achievement[] = ${JSON.stringify(data, null, 2)}`
+                content = `export type AchievementCategory = 'award' | 'certification' | 'publication' | 'speaking'\n\nexport interface Achievement {\n  id: string\n  title: string\n  organization: string\n  date: string\n  description: string\n  icon: string\n  verificationUrl?: string\n  category: AchievementCategory\n  certificateFile?: string\n}\n\nexport const achievements: Achievement[] = ${JSON.stringify(data, null, 2)}`
                 break
             default:
                 return NextResponse.json({ success: false, message: 'Invalid data type' }, { status: 400 })
