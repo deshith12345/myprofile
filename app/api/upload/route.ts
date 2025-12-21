@@ -2,10 +2,9 @@ import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import fs from 'fs/promises'
 import path from 'path'
-import { Octokit } from 'octokit'
+import { getDb } from '@/lib/mongodb'
 
 export async function POST(request: Request) {
-    const octokit = process.env.GITHUB_TOKEN ? new Octokit({ auth: process.env.GITHUB_TOKEN }) : null
     try {
         const session = await getSession()
         if (!session) {
@@ -35,86 +34,32 @@ export async function POST(request: Request) {
         // Sanitize filename
         const sanitizedName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase()
         const fileName = `${Date.now()}_${sanitizedName}`
-        const storagePath = `public/images/projects/${fileName}`
-        const publicUrl = `/images/projects/${fileName}`
-        const uploadDir = path.join(process.cwd(), 'public', 'images', 'projects')
-        const filePath = path.join(uploadDir, fileName)
 
-        // 1. Attempt local file update (works in local dev)
-        let localWriteSuccess = false
+        // 1. Save to MongoDB for persistent storage without redeployments
+        const db = await getDb()
+        await db.collection('images').insertOne({
+            name: fileName,
+            data: buffer,
+            contentType: file.type,
+            uploadDate: new Date()
+        })
+
+        // The URL will point to our new delivery API
+        const publicUrl = `/api/images/${fileName}`
+
+        // 2. Local storage fallback (for dev/local persist)
         try {
+            const uploadDir = path.join(process.cwd(), 'public', 'images', 'projects')
             await fs.mkdir(uploadDir, { recursive: true })
+            const filePath = path.join(uploadDir, fileName)
             await fs.writeFile(filePath, buffer)
-            localWriteSuccess = true
         } catch (writeError: any) {
             console.warn('Local FS Upload Failed (expected on Vercel):', writeError.message)
         }
 
-        // 2. Attempt GitHub persistent upload
-        let githubUploadSuccess = false
-        if (octokit && process.env.GITHUB_REPO) {
-            try {
-                const repoPath = process.env.GITHUB_REPO.replace(/^https:\/\/github\.com\//, '').replace(/\.git$/, '')
-                const [owner, repo] = repoPath.split('/')
-
-                if (!owner || !repo) {
-                    throw new Error(`Invalid GITHUB_REPO format: "${process.env.GITHUB_REPO}". Expected "owner/repo"`)
-                }
-
-                // Get existing file SHA if it exists (to prevent collisions/conflicts)
-                let currentSha: string | undefined
-                try {
-                    const { data: existingFile } = await octokit.rest.repos.getContent({
-                        owner,
-                        repo,
-                        path: storagePath,
-                        ref: 'main'
-                    })
-                    if (!Array.isArray(existingFile)) {
-                        currentSha = existingFile.sha
-                    }
-                } catch (e) {
-                    // File doesn't exist yet, which is fine
-                }
-
-                await octokit.rest.repos.createOrUpdateFileContents({
-                    owner,
-                    repo,
-                    path: storagePath,
-                    branch: 'main',
-                    message: `Admin Hub: Upload asset ${fileName}`,
-                    content: buffer.toString('base64'),
-                    sha: currentSha,
-                    committer: {
-                        name: 'Deshith Deemantha',
-                        email: 'deemanthadeshith@gmail.com',
-                    },
-                    author: {
-                        name: 'Deshith Deemantha',
-                        email: 'deemanthadeshith@gmail.com',
-                    },
-                })
-                githubUploadSuccess = true
-                console.log(`GitHub Asset Sync Success: ${storagePath}`)
-            } catch (githubError: any) {
-                console.error('GitHub Asset Sync Error:', githubError)
-                // If local write also failed, then we have a real problem
-                if (!localWriteSuccess) {
-                    return NextResponse.json({
-                        success: false,
-                        message: `Upload failed: GitHub API error (${githubError.status}). Asset will not persist.`
-                    }, { status: 500 })
-                }
-            }
-        }
-
-        if (!localWriteSuccess && !githubUploadSuccess) {
-            return NextResponse.json({ success: false, message: 'Storage failure: both local and remote writes failed.' }, { status: 500 })
-        }
-
         return NextResponse.json({
             success: true,
-            message: githubUploadSuccess ? 'Asset persistent on GitHub. Deployment triggered.' : 'Asset saved locally.',
+            message: 'Asset saved to database successfully.',
             url: publicUrl
         })
     } catch (error) {

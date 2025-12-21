@@ -148,8 +148,8 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
             {isUploading && (
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-20">
                     <Loader2 className="w-6 h-6 text-white animate-spin mb-3" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white animate-pulse">Syncing to GitHub</span>
-                    <span className="text-[8px] font-medium text-gray-400 mt-1">This will trigger a site redeploy</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white animate-pulse">Saving to Database</span>
+                    <span className="text-[8px] font-medium text-gray-400 mt-1">Changes are live instantly</span>
                 </div>
             )}
         </div>
@@ -159,7 +159,6 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState<Tab>('profile')
     const [isSaving, setIsSaving] = useState(false)
-    const [githubConfig, setGithubConfig] = useState<{ hasGithubToken: boolean, hasGithubRepo: boolean, repoName: string | null } | null>(null)
     const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string, url?: string | null } | null>(null)
 
     const [localProfile, setLocalProfile] = useState(profile)
@@ -167,20 +166,6 @@ export default function AdminDashboard() {
     const [localProjects, setLocalProjects] = useState([...projectsData])
     const [localAchievements, setLocalAchievements] = useState([...achievementsData])
 
-    useEffect(() => {
-        const fetchConfig = async () => {
-            try {
-                const res = await fetch('/api/config')
-                const data = await res.json()
-                if (data.success) {
-                    setGithubConfig(data.config)
-                }
-            } catch (err) {
-                console.error('Failed to fetch config:', err)
-            }
-        }
-        fetchConfig()
-    }, [])
 
     const router = useRouter()
 
@@ -207,10 +192,8 @@ export default function AdminDashboard() {
             { type: 'achievements', data: localAchievements },
         ]
 
-        let finalCommitUrl: string | null = null
-
         try {
-            // Save all categories sequentially to avoid GitHub commit conflicts
+            // Save all categories sequentially 
             for (const save of saves) {
                 const res = await fetch('/api/update', {
                     method: 'POST',
@@ -221,17 +204,11 @@ export default function AdminDashboard() {
                 if (!result.success) {
                     throw new Error(result.message || `Failed to sync ${save.type}`)
                 }
-
-                // Keep the final commit URL
-                if (result.commitUrl) {
-                    finalCommitUrl = result.commitUrl
-                }
             }
 
             setSaveStatus({
                 type: 'success',
-                message: 'Full synchronization complete. All sections are live.',
-                url: finalCommitUrl
+                message: 'All changes have been successfully saved to the database and are now live.',
             })
         } catch (err: any) {
             console.error('Save error:', err)
@@ -333,32 +310,17 @@ export default function AdminDashboard() {
                     )}
                 </AnimatePresence>
 
-                <div className="mb-8 p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50">
+                <div className="mb-8 p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/50">
                     <div className="flex gap-4">
-                        <div className="p-2 h-fit rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
-                            <AlertCircle className="w-5 h-5" />
+                        <div className="p-2 h-fit rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                            <CheckCircle2 className="w-5 h-5" />
                         </div>
                         <div>
-                            <h4 className="text-sm font-black uppercase tracking-widest text-amber-900 dark:text-amber-400 mb-2">Immutable Deployment Notice</h4>
-                            <p className="text-sm text-amber-800 dark:text-amber-300/80 leading-relaxed">
-                                You are currently connected to the <strong>Vercel Production Edge</strong>. Direct file writes are transient by default.
-                                <strong> To enable persistent updates:</strong> Add <code>GITHUB_TOKEN</code> and <code>GITHUB_REPO</code> to your Vercel Environment Variables.
+                            <h4 className="text-sm font-black uppercase tracking-widest text-emerald-900 dark:text-emerald-400 mb-2">Database Persistent Sync</h4>
+                            <p className="text-sm text-emerald-800 dark:text-emerald-300/80 leading-relaxed">
+                                You are connected to <strong>MongoDB Atlas</strong>. All updates to text and images are now persistent and <strong>do not require site redeployments</strong>.
+                                Your changes are reflected instantly on the live site.
                             </p>
-                            <div className="mt-4 flex flex-wrap gap-4">
-                                Feature Enabled: GitHub Auto-Sync & Redeploy
-                            </div>
-                            {githubConfig && (
-                                <div className="flex border-t border-amber-200/50 dark:border-amber-800/30 pt-4 mt-2 gap-6">
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-1.5 h-1.5 rounded-full ${githubConfig.hasGithubToken ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Token: {githubConfig.hasGithubToken ? 'Active' : 'Missing'}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-1.5 h-1.5 rounded-full ${githubConfig.hasGithubRepo ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Repo: {githubConfig.repoName || 'Not Set'}</span>
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
