@@ -239,7 +239,7 @@ export default function AdminDashboard() {
         } finally {
             setIsSaving(false)
         }
-    }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#030711] flex flex-col md:flex-row">
@@ -345,21 +345,20 @@ export default function AdminDashboard() {
                                 <strong> To enable persistent updates:</strong> Add <code>GITHUB_TOKEN</code> and <code>GITHUB_REPO</code> to your Vercel Environment Variables.
                             </p>
                             <div className="mt-4 flex flex-wrap gap-4">
-                                    Feature Enabled: GitHub Auto-Sync & Redeploy
-                                </div>
-                                {githubConfig && (
-                                    <div className="flex border-t border-amber-200/50 dark:border-amber-800/30 pt-4 mt-2 gap-6">
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-1.5 h-1.5 rounded-full ${githubConfig.hasGithubToken ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Token: {githubConfig.hasGithubToken ? 'Active' : 'Missing'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-1.5 h-1.5 rounded-full ${githubConfig.hasGithubRepo ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Repo: {githubConfig.repoName || 'Not Set'}</span>
-                                        </div>
-                                    </div>
-                                )}
+                                Feature Enabled: GitHub Auto-Sync & Redeploy
                             </div>
+                            {githubConfig && (
+                                <div className="flex border-t border-amber-200/50 dark:border-amber-800/30 pt-4 mt-2 gap-6">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-1.5 h-1.5 rounded-full ${githubConfig.hasGithubToken ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Token: {githubConfig.hasGithubToken ? 'Active' : 'Missing'}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-1.5 h-1.5 rounded-full ${githubConfig.hasGithubRepo ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Repo: {githubConfig.repoName || 'Not Set'}</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
