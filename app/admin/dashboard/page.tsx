@@ -322,7 +322,16 @@ export default function AdminDashboard() {
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Executive Summary</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Short Summary (Home Page)</label>
+                                    <input
+                                        type="text"
+                                        value={localProfile.bio}
+                                        onChange={(e) => setLocalProfile({ ...localProfile, bio: e.target.value })}
+                                        className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm font-bold focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Executive Summary (Full Bio)</label>
                                     <textarea
                                         rows={6}
                                         value={localProfile.longBio}
