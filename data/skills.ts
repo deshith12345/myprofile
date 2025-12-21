@@ -120,7 +120,7 @@ export const skills: Skill[] = [
     "brandColor": "666666"
   },
   {
-    "name": "owaspzap",
+    "name": "zap",
     "category": "security-tools",
     "proficiency": 50,
     "icon": "owaspzap",
