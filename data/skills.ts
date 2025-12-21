@@ -56,14 +56,6 @@ export const skills: Skill[] = [
     "brandColor": "557C94"
   },
   {
-    "name": "Nessus",
-    "category": "security-tools",
-    "proficiency": 78,
-    "icon": "nessus",
-    "isBrandIcon": true,
-    "brandColor": "003F59"
-  },
-  {
     "name": "Python",
     "category": "programming",
     "proficiency": 90,
@@ -128,11 +120,11 @@ export const skills: Skill[] = [
     "brandColor": "666666"
   },
   {
-    "name": "Parrot OS",
+    "name": "ubuntu",
     "category": "security-tools",
     "proficiency": 50,
-    "icon": "parrotos",
+    "icon": "ubuntu",
     "isBrandIcon": true,
-    "brandColor": "666666"
+    "brandColor": "E95420"
   }
 ]
