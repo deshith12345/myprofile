@@ -57,7 +57,7 @@ export async function POST(request: Request) {
                     owner,
                     repo,
                     path: filePath,
-                    message: `Admin: Update ${type} data [skip ci]`,
+                    message: `[skip ci] Admin: Update ${type} data`,
                     content: base64Content,
                     sha,
                     branch: 'main'

@@ -58,7 +58,7 @@ export async function POST(request: Request) {
                     owner,
                     repo,
                     path: storagePath,
-                    message: `Admin: Upload image ${fileName} [skip ci]`,
+                    message: `[skip ci] Admin: Upload image ${fileName}`,
                     content: buffer.toString('base64'),
                     branch: 'main'
                 })
