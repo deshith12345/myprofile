@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     LayoutDashboard,
@@ -207,6 +207,8 @@ export default function AdminDashboard() {
             { type: 'achievements', data: localAchievements },
         ]
 
+        let finalCommitUrl: string | null = null
+
         try {
             // Save all categories sequentially to avoid GitHub commit conflicts
             for (const save of saves) {
@@ -362,25 +364,6 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                <AnimatePresence mode="wait">
-                    {saveStatus && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className={`mb-8 p-4 rounded-2xl flex items-center justify-between border ${saveStatus.type === 'success'
-                                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400'
-                                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400'
-                                }`}
-                        >
-                            <div className="flex items-center gap-3">
-                                {saveStatus.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-                                <span className="font-bold text-sm">{saveStatus.message}</span>
-                            </div>
-                            <button onClick={() => setSaveStatus(null)} className="text-xs font-black uppercase tracking-tighter hover:opacity-70">Dismiss</button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
 
                 <Card className="bg-white dark:bg-gray-900/40 border-gray-200 dark:border-gray-800 p-8 shadow-sm rounded-3xl">
                     <motion.div
