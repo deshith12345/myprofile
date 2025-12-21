@@ -1,23 +1,4 @@
-export interface Project {
-  id: string
-  title: string
-  description: string
-  longDescription: string
-  image: string
-  images?: string[]
-  technologies: string[]
-  category: 'web' | 'mobile' | 'opensource' | 'other'
-  featured: boolean
-  liveUrl?: string
-  githubUrl?: string
-  date: string
-  highlights: string[]
-  role?: string
-  status?: string
-  challenges?: string[]
-}
-
-export const projects: Project[] = [
+export const projects = [
   {
     "id": "1114980182",
     "title": "Nebula Security Labs",
