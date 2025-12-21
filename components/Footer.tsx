@@ -1,7 +1,7 @@
 'use client'
 
 import { Github, Linkedin, Mail, Twitter, ArrowUp } from 'lucide-react'
-import { profile } from '@/data/profile'
+import { Profile } from '@/data/types'
 import { scrollToElement } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 
@@ -20,7 +20,7 @@ const getIcon = (platform: string) => {
   }
 }
 
-export function Footer() {
+export function Footer({ profile }: { profile: Profile }) {
   const currentYear = new Date().getFullYear()
 
   return (

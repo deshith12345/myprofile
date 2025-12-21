@@ -101,13 +101,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <StructuredData />
-      </head>
       <body className={`${inter.variable} ${firaCode.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>
   )
 }
-

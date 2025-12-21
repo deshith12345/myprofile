@@ -5,6 +5,7 @@ import { Projects } from '@/components/Projects'
 import { Achievements } from '@/components/Achievements'
 import { Contact } from '@/components/Contact'
 import { Footer } from '@/components/Footer'
+import { StructuredData } from '@/components/StructuredData'
 import { getDb } from '@/lib/mongodb'
 
 // Fallback data
@@ -45,13 +46,14 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen">
-      <Header />
+      <StructuredData profile={profile} />
+      <Header profile={profile} />
       <Hero profile={profile} />
       <About skills={skills} />
       <Projects projects={projects} />
       <Achievements achievements={achievements} />
-      <Contact />
-      <Footer />
+      <Contact profile={profile} />
+      <Footer profile={profile} />
     </main>
   )
 }

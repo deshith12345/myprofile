@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Send, Mail, MapPin, Clock, CheckCircle, AlertCircle } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { profile } from '@/data/profile'
+import { Profile } from '@/data/types'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -20,7 +20,7 @@ const contactSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactSchema>
 
-export function Contact() {
+export function Contact({ profile }: { profile: Profile }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<{
     type: 'success' | 'error' | null

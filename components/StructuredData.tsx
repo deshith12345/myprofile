@@ -1,7 +1,7 @@
-import { profile } from '@/data/profile'
+import { Profile } from '@/data/types'
 
 // Structured data for SEO (JSON-LD Schema)
-export function StructuredData() {
+export function StructuredData({ profile }: { profile: Profile }) {
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
@@ -30,7 +30,7 @@ export function StructuredData() {
 }
 
 // Structured data for individual projects
-export function ProjectSchema({ project }: { project: any }) {
+export function ProjectSchema({ project, profile }: { project: any, profile: Profile }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',

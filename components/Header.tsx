@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
 import { scrollToElement } from '@/lib/utils'
-import { profile } from '@/data/profile'
+import { Profile } from '@/data/types'
 
 const navItems = [
   { label: 'Home', href: '#home' },
@@ -14,7 +14,7 @@ const navItems = [
   { label: 'Contact', href: '#contact' },
 ]
 
-export function Header() {
+export function Header({ profile }: { profile: Profile }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
@@ -62,8 +62,8 @@ export function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-          ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-md'
-          : 'bg-transparent'
+        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-md'
+        : 'bg-transparent'
         }`}
     >
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,8 +84,8 @@ export function Header() {
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
                 className={`text-sm font-medium transition-colors duration-200 ${activeSection === item.href.substring(1)
-                    ? 'text-primary-600 dark:text-primary-400'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
+                  ? 'text-primary-600 dark:text-primary-400'
+                  : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
                   }`}
               >
                 {item.label}
@@ -120,8 +120,8 @@ export function Header() {
                 onClick={() => handleNavClick(item.href)}
                 aria-label={`Go to ${item.label} section`}
                 className={`block w-full text-left px-4 py-2 text-sm font-medium transition-colors duration-200 ${activeSection === item.href.substring(1)
-                    ? 'text-primary-600 dark:text-primary-400'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
+                  ? 'text-primary-600 dark:text-primary-400'
+                  : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
                   }`}
               >
                 {item.label}
