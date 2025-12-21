@@ -59,7 +59,7 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
             const data = await res.json()
             if (data.success) {
                 onUpload(data.url)
-                setPreviewUrl(null) // Clear local preview once server URL is back
+                // We keep the preview until the parent gives us a new currentFile
             } else {
                 alert(`Upload failed: ${data.message}`)
                 setPreviewUrl(null)
@@ -72,6 +72,13 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
             setIsUploading(false)
         }
     }
+
+    // Effect to clear preview once the actual file update propagates
+    useEffect(() => {
+        if (currentFile && previewUrl) {
+            setPreviewUrl(null)
+        }
+    }, [currentFile])
 
     const displayUrl = previewUrl || currentFile
     const isImage = displayUrl?.match(/\.(jpg|jpeg|png|gif|webp|blob:)/i) || previewUrl
@@ -144,12 +151,28 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState<Tab>('profile')
     const [isSaving, setIsSaving] = useState(false)
-    const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+    const [githubConfig, setGithubConfig] = useState<{ hasGithubToken: boolean, hasGithubRepo: boolean, repoName: string | null } | null>(null)
+    const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string, url?: string | null } | null>(null)
 
     const [localProfile, setLocalProfile] = useState(profile)
     const [localSkills, setLocalSkills] = useState([...skillsData])
     const [localProjects, setLocalProjects] = useState([...projectsData])
     const [localAchievements, setLocalAchievements] = useState([...achievementsData])
+
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const res = await fetch('/api/config')
+                const data = await res.json()
+                if (data.success) {
+                    setGithubConfig(data.config)
+                }
+            } catch (err) {
+                console.error('Failed to fetch config:', err)
+            }
+        }
+        fetchConfig()
+    }, [])
 
     const router = useRouter()
 
@@ -169,30 +192,40 @@ export default function AdminDashboard() {
         setIsSaving(true)
         setSaveStatus(null)
 
-        let payload = {}
-        switch (activeTab) {
-            case 'profile': payload = localProfile; break;
-            case 'skills': payload = localSkills; break;
-            case 'projects': payload = localProjects; break;
-            case 'achievements': payload = localAchievements; break;
-        }
+        const saves = [
+            { type: 'profile', data: localProfile },
+            { type: 'skills', data: localSkills },
+            { type: 'projects', data: localProjects },
+            { type: 'achievements', data: localAchievements },
+        ]
 
         try {
-            const res = await fetch('/api/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: activeTab, data: payload }),
-            })
+            // Save all categories sequentially to avoid GitHub commit conflicts
+            for (const save of saves) {
+                const res = await fetch('/api/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(save),
+                })
+                const result = await res.json()
+                if (!result.success) {
+                    throw new Error(result.message || `Failed to sync ${save.type}`)
+                }
 
-            const result = await res.json()
-
-            if (result.success) {
-                setSaveStatus({ type: 'success', message: 'Synchronization complete. Changes are live.' })
-            } else {
-                setSaveStatus({ type: 'error', message: result.message || 'Failed to synchronize data.' })
+                // Keep the final commit URL
+                if (result.commitUrl) {
+                    finalCommitUrl = result.commitUrl
+                }
             }
-        } catch (err) {
-            setSaveStatus({ type: 'error', message: 'Network error during synchronization.' })
+
+            setSaveStatus({
+                type: 'success',
+                message: 'Full synchronization complete. All sections are live.',
+                url: finalCommitUrl
+            })
+        } catch (err: any) {
+            console.error('Save error:', err)
+            setSaveStatus({ type: 'error', message: err.message || 'Error during synchronization.' })
         } finally {
             setIsSaving(false)
         }
@@ -258,6 +291,38 @@ export default function AdminDashboard() {
                     </Button>
                 </header>
 
+                <AnimatePresence>
+                    {saveStatus && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className={`mb-8 p-4 rounded-xl border flex items-center justify-between gap-4 ${saveStatus.type === 'success'
+                                ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-400'
+                                : 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800/50 text-red-800 dark:text-red-400'
+                                }`}
+                        >
+                            <div className="flex items-center gap-3">
+                                {saveStatus.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                                <span className="text-sm font-bold">{saveStatus.message}</span>
+                            </div>
+                            {saveStatus.url && (
+                                <a
+                                    href={saveStatus.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3 py-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-800/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2"
+                                >
+                                    Verify Commit <ExternalLink className="w-3 h-3" />
+                                </a>
+                            )}
+                            <button onClick={() => setSaveStatus(null)} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-all">
+                                <X className="w-4 h-4 opacity-50" />
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 <div className="mb-8 p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50">
                     <div className="flex gap-4">
                         <div className="p-2 h-fit rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
@@ -270,10 +335,20 @@ export default function AdminDashboard() {
                                 <strong> To enable persistent updates:</strong> Add <code>GITHUB_TOKEN</code> and <code>GITHUB_REPO</code> to your Vercel Environment Variables.
                             </p>
                             <div className="mt-4 flex flex-wrap gap-4">
-                                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tighter text-amber-700 dark:text-amber-500">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                                     Feature Enabled: GitHub Auto-Sync & Redeploy
                                 </div>
+                                {githubConfig && (
+                                    <div className="flex border-t border-amber-200/50 dark:border-amber-800/30 pt-4 mt-2 gap-6">
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${githubConfig.hasGithubToken ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Token: {githubConfig.hasGithubToken ? 'Active' : 'Missing'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${githubConfig.hasGithubRepo ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Repo: {githubConfig.repoName || 'Not Set'}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -314,7 +389,7 @@ export default function AdminDashboard() {
                                         <DropZone
                                             currentFile={localProfile.image}
                                             aspect="square"
-                                            onUpload={(url) => setLocalProfile({ ...localProfile, image: url })}
+                                            onUpload={(url) => setLocalProfile(prev => ({ ...prev, image: url }))}
                                         />
                                     </div>
                                     <p className="text-[9px] text-gray-400 font-medium">Recommended: Square aspect ratio (1:1) for optimal circular display.</p>
@@ -842,7 +917,7 @@ export default function AdminDashboard() {
                         )}
                     </motion.div>
                 </Card>
-            </main>
+            </main >
         </div >
     )
 }

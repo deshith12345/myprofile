@@ -116,9 +116,14 @@ export async function POST(request: Request) {
             }, { status: 500 })
         }
 
+        // Extract owner/repo once more for the URL return
+        const repoPath = process.env.GITHUB_REPO?.replace(/^https:\/\/github\.com\//, '').replace(/\.git$/, '') || ''
+        const [owner, repo] = repoPath.split('/')
+
         return NextResponse.json({
             success: true,
-            message: githubUpdateSuccess ? 'Data synchronized to GitHub. Site will redeploy automatically.' : 'Data saved locally.'
+            message: githubUpdateSuccess ? 'Data synchronized to GitHub. Site will redeploy automatically.' : 'Data saved locally.',
+            commitUrl: githubUpdateSuccess ? `https://github.com/${owner}/${repo}/commits/main` : null
         })
     } catch (error) {
         console.error('Update Request Error:', error)
