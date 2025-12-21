@@ -6,7 +6,6 @@ import { Award, BookOpen, Cloud, Github, Mic, Trophy, ExternalLink } from 'lucid
 import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { achievements } from '@/data/achievements'
 import { formatDate } from '@/lib/utils'
 import { CertificateModal } from './CertificateModal'
 import type { Achievement, AchievementCategory } from '@/data/achievements'
@@ -26,7 +25,7 @@ const categoryLabels: Record<AchievementCategory, string> = {
   speaking: 'Speaking',
 }
 
-export function Achievements() {
+export function Achievements({ achievements }: { achievements: Achievement[] }) {
   const [selectedCertificate, setSelectedCertificate] = useState<Achievement | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 

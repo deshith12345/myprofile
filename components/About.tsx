@@ -15,7 +15,7 @@ import {
   GitBranch,
   Command
 } from 'lucide-react'
-import { skills as skillsData, Skill } from '@/data/skills'
+import { Skill } from '@/data/skills'
 
 const iconMap: { [key: string]: any } = {
   'activity': Activity,
@@ -77,7 +77,8 @@ function SkillCard({ skill }: { skill: Skill }) {
   )
 }
 
-export function About() {
+export function About({ skills }: { skills: Skill[] }) {
+  const skillsData = skills // Keep consistency with previous naming if needed
   return (
     <section id="about" className="py-24 bg-[#F8FAFC] dark:bg-[#030711] relative overflow-hidden">
       {/* Subtle background glow */}

@@ -4,11 +4,9 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Download, ExternalLink, Github, Linkedin, Mail, Twitter } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { profile } from '@/data/profile'
-import { scrollToElement } from '@/lib/utils'
-import Image from 'next/image'
+import { profile as ProfileType } from '@/data/profile'
 
-export function Hero() {
+export function Hero({ profile }: { profile: typeof ProfileType }) {
   const roles = profile.roles || ['Cybersecurity Student', 'Security Analyst', 'Penetration Tester', 'Threat Hunter']
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [displayText, setDisplayText] = useState('')

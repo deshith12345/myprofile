@@ -2,15 +2,15 @@
 
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { projects as projectsData, Project } from '@/data/projects'
 import { ProjectCard } from './ProjectCard'
 import { ProjectModal } from './ProjectModal'
 import { Badge } from '@/components/ui/Badge'
 
 type Filter = 'all' | 'web' | 'mobile' | 'opensource' | 'other'
 type Sort = 'latest' | 'popular' | 'featured'
+import { Project } from '@/data/projects'
 
-export function Projects() {
+export function Projects({ projects: projectsData }: { projects: Project[] }) {
   const [filter, setFilter] = useState<Filter>('all')
   const [sort, setSort] = useState<Sort>('latest')
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
@@ -96,8 +96,8 @@ export function Projects() {
                 key={filterOption.value}
                 onClick={() => setFilter(filterOption.value)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${filter === filterOption.value
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                   }`}
               >
                 {filterOption.label}
