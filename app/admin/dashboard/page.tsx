@@ -162,7 +162,10 @@ export default function AdminDashboard() {
     const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string, url?: string | null } | null>(null)
 
     const [isLoadingData, setIsLoadingData] = useState(true)
-
+    const [localProfile, setLocalProfile] = useState(profile)
+    const [localSkills, setLocalSkills] = useState([...skillsData])
+    const [localProjects, setLocalProjects] = useState([...projectsData])
+    const [localAchievements, setLocalAchievements] = useState([...achievementsData])
     useEffect(() => {
         const fetchAllData = async () => {
             try {
