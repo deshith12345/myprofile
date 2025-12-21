@@ -1,5 +1,5 @@
 export const profile = {
-  "name": "Deshith Deemantha demantha",
+  "name": "Deshith Deemantha",
   "title": "Cybersecurity Student & Security Analyst",
   "tagline": "Protecting digital assets through threat analysis and security best practices",
   "bio": "I'm a dedicated cybersecurity student with a passion for protecting systems and data. \n  Specialized in threat analysis, network security, and penetration testing, I work to identify \n  vulnerabilities and implement robust security solutions.",
