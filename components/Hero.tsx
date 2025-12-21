@@ -235,7 +235,7 @@ export function Hero() {
               <div className="absolute inset-0 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full blur-3xl opacity-50" />
               <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-2xl bg-gradient-to-br from-primary-400 to-secondary-400">
                 <Image
-                  src="/profile.jpg"
+                  src={profile.image || "/profile.jpg"}
                   alt={profile.name}
                   fill
                   className="object-cover"

@@ -282,6 +282,16 @@ export default function AdminDashboard() {
                     >
                         {activeTab === 'profile' && (
                             <div className="space-y-8">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Avatar / Profile Picture</label>
+                                    <div className="max-w-[200px]">
+                                        <DropZone
+                                            currentFile={localProfile.image}
+                                            onUpload={(url) => setLocalProfile({ ...localProfile, image: url })}
+                                        />
+                                    </div>
+                                    <p className="text-[9px] text-gray-400 font-medium">Recommended: Square aspect ratio (1:1) for optimal circular display.</p>
+                                </div>
                                 <div className="grid md:grid-cols-2 gap-8">
                                     <div className="space-y-3">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Identity / Name</label>
