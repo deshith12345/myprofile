@@ -118,5 +118,13 @@ export const skills: Skill[] = [
     "icon": "microsoftpowershell",
     "isBrandIcon": true,
     "brandColor": "666666"
+  },
+  {
+    "name": "owaspzap",
+    "category": "security-tools",
+    "proficiency": 50,
+    "icon": "owaspzap",
+    "isBrandIcon": true,
+    "brandColor": "666666"
   }
 ]
