@@ -3,8 +3,10 @@ import { getSession } from '@/lib/auth'
 import fs from 'fs/promises'
 import path from 'path'
 import { getDb } from '@/lib/mongodb'
+import { Octokit } from 'octokit'
 
 export async function POST(request: Request) {
+    const octokit = process.env.GITHUB_TOKEN ? new Octokit({ auth: process.env.GITHUB_TOKEN }) : null
     try {
         const session = await getSession()
         if (!session) {
@@ -35,7 +37,7 @@ export async function POST(request: Request) {
         const sanitizedName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase()
         const fileName = `${Date.now()}_${sanitizedName}`
 
-        // 1. Save to MongoDB for persistent storage without redeployments
+        // 1. Save to MongoDB (Persistent database storage)
         const db = await getDb()
         await db.collection('images').insertOne({
             name: fileName,
@@ -44,10 +46,32 @@ export async function POST(request: Request) {
             uploadDate: new Date()
         })
 
-        // The URL will point to our new delivery API
+        // 2. Silent Sync to GitHub (Backup without triggering redeploy)
+        let githubSyncSuccess = false
+        if (octokit && process.env.GITHUB_REPO) {
+            try {
+                const repoPath = process.env.GITHUB_REPO.replace(/^https:\/\/github\.com\//, '').replace(/\.git$/, '')
+                const [owner, repo] = repoPath.split('/')
+                const storagePath = `public/images/projects/${fileName}`
+
+                await octokit.rest.repos.createOrUpdateFileContents({
+                    owner,
+                    repo,
+                    path: storagePath,
+                    message: `Admin: Upload image ${fileName} [skip ci]`,
+                    content: buffer.toString('base64'),
+                    branch: 'main'
+                })
+                githubSyncSuccess = true
+            } catch (err) {
+                console.error('GitHub Image Sync Failed:', err)
+            }
+        }
+
+        // The URL will point to our delivery API
         const publicUrl = `/api/images/${fileName}`
 
-        // 2. Local storage fallback (for dev/local persist)
+        // 3. Local storage fallback (for dev/local persist)
         try {
             const uploadDir = path.join(process.cwd(), 'public', 'images', 'projects')
             await fs.mkdir(uploadDir, { recursive: true })
@@ -59,8 +83,9 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             success: true,
-            message: 'Asset saved to database successfully.',
-            url: publicUrl
+            message: `Asset saved to database. ${githubSyncSuccess ? 'GitHub synced silently.' : ''}`,
+            url: publicUrl,
+            githubSynced: githubSyncSuccess
         })
     } catch (error) {
         console.error('Upload Error:', error)
