@@ -52,7 +52,13 @@ export async function POST(request: Request) {
         let githubUpdateSuccess = false
         if (octokit && process.env.GITHUB_REPO) {
             try {
-                const [owner, repo] = process.env.GITHUB_REPO.split('/')
+                const repoPath = process.env.GITHUB_REPO.replace(/^https:\/\/github\.com\//, '').replace(/\.git$/, '')
+                const [owner, repo] = repoPath.split('/')
+
+                if (!owner || !repo) {
+                    throw new Error(`Invalid GITHUB_REPO format: "${process.env.GITHUB_REPO}". Expected "owner/repo"`)
+                }
+
                 const relativePath = path.relative(process.cwd(), filePath).replace(/\\/g, '/')
 
                 // Get the current file SHA
@@ -62,7 +68,7 @@ export async function POST(request: Request) {
                         owner,
                         repo,
                         path: relativePath,
-                        ref: 'main' // Explicitly use main branch
+                        ref: 'main'
                     })
                     if (!Array.isArray(currentFile)) {
                         currentFileSha = currentFile.sha
@@ -81,12 +87,12 @@ export async function POST(request: Request) {
                     content: Buffer.from(content).toString('base64'),
                     sha: currentFileSha,
                     committer: {
-                        name: 'Admin Dashboard',
-                        email: 'admin@portfolio.vercel.app',
+                        name: 'Deshith Deemantha',
+                        email: 'deemanthadeshith@gmail.com',
                     },
                     author: {
-                        name: 'Admin Dashboard',
-                        email: 'admin@portfolio.vercel.app',
+                        name: 'Deshith Deemantha',
+                        email: 'deemanthadeshith@gmail.com',
                     },
                 })
                 console.log(`GitHub Sync Success: ${relativePath} [SHA: ${response.data.content?.sha}]`);
