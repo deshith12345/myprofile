@@ -1,18 +1,4 @@
-export type AchievementCategory = 'award' | 'certification' | 'publication' | 'speaking'
-
-export interface Achievement {
-  id: string
-  title: string
-  organization: string
-  date: string
-  description: string
-  icon: string
-  verificationUrl?: string
-  category: AchievementCategory
-  certificateFile?: string
-}
-
-export const achievements: Achievement[] = [
+export const achievements = [
   {
     "id": "isc2-domain-2",
     "title": "ISC2 Domain 2 Certification",
