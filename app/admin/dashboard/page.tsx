@@ -148,8 +148,8 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
             {isUploading && (
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-20">
                     <Loader2 className="w-6 h-6 text-white animate-spin mb-3" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white animate-pulse">Saving to Database</span>
-                    <span className="text-[8px] font-medium text-gray-400 mt-1">Changes are live instantly</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white animate-pulse">Syncing to Database & GitHub</span>
+                    <span className="text-[8px] font-medium text-gray-400 mt-1">Changes are live instantly (No Build Triggered)</span>
                 </div>
             )}
         </div>
@@ -161,11 +161,27 @@ export default function AdminDashboard() {
     const [isSaving, setIsSaving] = useState(false)
     const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string, url?: string | null } | null>(null)
 
-    const [localProfile, setLocalProfile] = useState(profile)
-    const [localSkills, setLocalSkills] = useState([...skillsData])
-    const [localProjects, setLocalProjects] = useState([...projectsData])
-    const [localAchievements, setLocalAchievements] = useState([...achievementsData])
+    const [isLoadingData, setIsLoadingData] = useState(true)
 
+    useEffect(() => {
+        const fetchAllData = async () => {
+            try {
+                const res = await fetch('/api/all-data')
+                const result = await res.json()
+                if (result.success) {
+                    setLocalProfile(result.data.profile)
+                    setLocalSkills(result.data.skills)
+                    setLocalProjects(result.data.projects)
+                    setLocalAchievements(result.data.achievements)
+                }
+            } catch (err) {
+                console.error('Failed to pre-fetch database data:', err)
+            } finally {
+                setIsLoadingData(false)
+            }
+        }
+        fetchAllData()
+    }, [])
 
     const router = useRouter()
 
@@ -217,6 +233,17 @@ export default function AdminDashboard() {
             setIsSaving(false)
         }
     };
+
+    if (isLoadingData) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-[#030711] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-10 h-10 text-primary-600 animate-spin" />
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 animate-pulse">Initializing Secure Session</p>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#030711] flex flex-col md:flex-row">
