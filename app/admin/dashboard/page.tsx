@@ -189,8 +189,8 @@ export default function AdminDashboard() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as Tab)}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id
-                                        ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 border border-primary-500/20'
-                                        : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent'
+                                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 border border-primary-500/20'
+                                    : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent'
                                     }`}
                             >
                                 <Icon className="w-4 h-4" />
@@ -226,9 +226,29 @@ export default function AdminDashboard() {
                         ) : (
                             <Save className="w-4 h-4 mr-2" />
                         )}
-                        Push Changes
+                        Sync to Baseline
                     </Button>
                 </header>
+
+                <div className="mb-8 p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50">
+                    <div className="flex gap-4">
+                        <div className="p-2 h-fit rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                            <AlertCircle className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h4 className="text-sm font-black uppercase tracking-widest text-amber-900 dark:text-amber-400 mb-2">Immutable Deployment Notice</h4>
+                            <p className="text-sm text-amber-800 dark:text-amber-300/80 leading-relaxed">
+                                You are currently connected to the <strong>Vercel Production Edge</strong>. Due to Vercel&apos;s security architecture, direct file writes are transient and <strong>will not persist</strong> after the server restarts.
+                            </p>
+                            <div className="mt-4 flex flex-wrap gap-4">
+                                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tighter text-amber-700 dark:text-amber-500">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                    Persistent Workflow: Edit Locally → Push to GitHub
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <AnimatePresence mode="wait">
                     {saveStatus && (
@@ -237,8 +257,8 @@ export default function AdminDashboard() {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             className={`mb-8 p-4 rounded-2xl flex items-center justify-between border ${saveStatus.type === 'success'
-                                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400'
-                                    : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400'
+                                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400'
+                                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400'
                                 }`}
                         >
                             <div className="flex items-center gap-3">

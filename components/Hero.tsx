@@ -29,11 +29,11 @@ export function Hero() {
         setDisplayText(currentRole.substring(0, displayText.length + 1))
       }, 100)
     } else if (!isDeleting && displayText.length === currentRole.length) {
-      timeout = setTimeout(() => setIsDeleting(true), 2000)
+      timeout = setTimeout(() => setIsDeleting(true), 2500) // Slightly longer pause
     } else if (isDeleting && displayText.length > 0) {
       timeout = setTimeout(() => {
         setDisplayText(currentRole.substring(0, displayText.length - 1))
-      }, 50)
+      }, 40) // Faster deletion
     } else if (isDeleting && displayText.length === 0) {
       setIsDeleting(false)
       setCurrentRoleIndex((prev) => (prev + 1) % roles.length)
@@ -86,26 +86,26 @@ export function Hero() {
       {/* Animated Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 -z-10" />
 
-      {/* Particle Effect Background */}
-      {isClient && (
-        <div className="absolute inset-0 -z-10">
-          {[...Array(typeof window !== 'undefined' && window.innerWidth < 768 ? 20 : 50)].map((_, i) => (
+      {/* Particle Effect Background - Disabled on mobile to save performance */}
+      {isClient && typeof window !== 'undefined' && window.innerWidth >= 768 && (
+        <div className="absolute inset-0 -z-10 pointer-events-none">
+          {[...Array(30)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-primary-400 dark:bg-primary-600 rounded-full opacity-30"
               initial={{
-                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1200),
-                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
               }}
               animate={{
                 y: [
                   null,
-                  Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
+                  Math.random() * window.innerHeight,
                 ],
                 opacity: [0.3, 0.6, 0.3],
               }}
               transition={{
-                duration: Math.random() * 3 + 2,
+                duration: Math.random() * 5 + 5, // Slower transitions
                 repeat: Infinity,
                 delay: Math.random() * 2,
               }}
@@ -240,6 +240,7 @@ export function Hero() {
                   fill
                   className="object-cover"
                   priority
+                  sizes="(max-width: 768px) 224px, (max-width: 1024px) 320px, 384px"
                   onError={(e) => {
                     // Fallback to gradient if image fails to load
                     e.currentTarget.style.display = 'none'
@@ -253,9 +254,9 @@ export function Hero() {
         {/* Scroll Down Indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, repeat: Infinity, repeatType: 'reverse', duration: 1.5 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
         >
           <button
             onClick={() => scrollToElement('about')}
@@ -265,7 +266,11 @@ export function Hero() {
             <span className="text-sm mb-2">Scroll Down</span>
             <motion.div
               animate={{ y: [0, 8, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
+              transition={{
+                repeat: Infinity,
+                duration: 2, // Slower animation
+                ease: "easeInOut"
+              }}
             >
               <svg
                 className="w-6 h-6"

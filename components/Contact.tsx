@@ -110,7 +110,7 @@ export function Contact() {
                     <h4 className="font-semibold mb-1">Email</h4>
                     <a
                       href={`mailto:${profile.email}`}
-                      className="text-primary-600 dark:text-primary-400 hover:underline"
+                      className="text-primary-600 dark:text-primary-400 font-bold hover:underline"
                     >
                       {profile.email}
                     </a>
@@ -271,8 +271,8 @@ export function Contact() {
                     <p
                       className={
                         submitStatus.type === 'success'
-                          ? 'text-green-800 dark:text-green-200'
-                          : 'text-red-800 dark:text-red-200'
+                          ? 'text-green-900 dark:text-green-300 font-bold'
+                          : 'text-red-900 dark:text-red-300 font-bold'
                       }
                     >
                       {submitStatus.message}

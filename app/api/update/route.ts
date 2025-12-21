@@ -37,11 +37,19 @@ export async function POST(request: Request) {
                 return NextResponse.json({ success: false, message: 'Invalid data type' }, { status: 400 })
         }
 
-        await fs.writeFile(filePath, content, 'utf-8')
+        try {
+            await fs.writeFile(filePath, content, 'utf-8')
+        } catch (writeError: any) {
+            console.error('File System Write Error:', writeError)
+            return NextResponse.json({
+                success: false,
+                message: process.env.VERCEL ? 'Vercel filesystem is read-only. Please update locally and push.' : 'Failed to write to local data file.'
+            }, { status: 500 })
+        }
 
         return NextResponse.json({ success: true, message: 'Data updated successfully' })
     } catch (error) {
-        console.error('Update Error:', error)
-        return NextResponse.json({ success: false, message: 'Failed to update data' }, { status: 500 })
+        console.error('Update Request Error:', error)
+        return NextResponse.json({ success: false, message: 'Invalid synchronization request' }, { status: 500 })
     }
 }

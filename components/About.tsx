@@ -40,8 +40,8 @@ function SkillCard({ skill }: { skill: Skill }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
       whileHover={{ y: -5 }}
+      layout
       className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:border-primary-500/30 transition-all duration-300"
     >
       <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 p-2">

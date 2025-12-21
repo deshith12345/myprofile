@@ -20,25 +20,38 @@ export function Header() {
   const [activeSection, setActiveSection] = useState('home')
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-      
-      // Update active section based on scroll position
-      const sections = navItems.map((item) => item.href.substring(1))
-      const currentSection = sections.find((section) => {
-        const element = document.getElementById(section)
-        if (element) {
-          const rect = element.getBoundingClientRect()
-          return rect.top <= 100 && rect.bottom >= 100
-        }
-        return false
-      })
-      if (currentSection) setActiveSection(currentSection)
-    }
+    let lastKnownScrollPosition = 0;
+    let ticking = false;
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    const handleScroll = () => {
+      lastKnownScrollPosition = window.scrollY;
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(lastKnownScrollPosition > 20);
+
+          // Update active section based on scroll position - more efficient
+          const sections = navItems.map((item) => item.href.substring(1));
+          const currentSection = sections.find((section) => {
+            const element = document.getElementById(section);
+            if (element) {
+              const rect = element.getBoundingClientRect();
+              return rect.top <= 100 && rect.bottom >= 100;
+            }
+            return false;
+          });
+          if (currentSection) setActiveSection(currentSection);
+
+          ticking = false;
+        });
+
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleNavClick = (href: string) => {
     const id = href.substring(1)
@@ -48,11 +61,10 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
           ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-md'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
@@ -60,6 +72,7 @@ export function Header() {
           <button
             onClick={() => handleNavClick('#home')}
             className="text-xl md:text-2xl font-bold gradient-text"
+            aria-label="Back to top"
           >
             {profile.name.split(' ')[0]}
           </button>
@@ -70,11 +83,10 @@ export function Header() {
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className={`text-sm font-medium transition-colors duration-200 ${
-                  activeSection === item.href.substring(1)
+                className={`text-sm font-medium transition-colors duration-200 ${activeSection === item.href.substring(1)
                     ? 'text-primary-600 dark:text-primary-400'
                     : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
-                }`}
+                  }`}
               >
                 {item.label}
               </button>
@@ -106,11 +118,11 @@ export function Header() {
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className={`block w-full text-left px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-                  activeSection === item.href.substring(1)
+                aria-label={`Go to ${item.label} section`}
+                className={`block w-full text-left px-4 py-2 text-sm font-medium transition-colors duration-200 ${activeSection === item.href.substring(1)
                     ? 'text-primary-600 dark:text-primary-400'
                     : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
-                }`}
+                  }`}
               >
                 {item.label}
               </button>
