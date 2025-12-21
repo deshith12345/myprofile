@@ -1,13 +1,4 @@
-export interface Skill {
-  name: string
-  category: 'security-tools' | 'programming' | 'security-concepts' | 'cloud-security' | 'compliance'
-  proficiency: number
-  icon?: string
-  isBrandIcon?: boolean
-  brandColor?: string
-}
-
-export const skills: Skill[] = [
+export const skills = [
   {
     "name": "Wireshark",
     "category": "security-tools",
@@ -126,5 +117,13 @@ export const skills: Skill[] = [
     "icon": "ubuntu",
     "isBrandIcon": true,
     "brandColor": "E95420"
+  },
+  {
+    "name": "C",
+    "category": "programming",
+    "proficiency": 50,
+    "icon": "c",
+    "isBrandIcon": true,
+    "brandColor": "666666"
   }
 ]
