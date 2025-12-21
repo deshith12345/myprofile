@@ -103,7 +103,7 @@ export async function POST(request: Request) {
                 if (!localWriteSuccess) {
                     return NextResponse.json({
                         success: false,
-                        message: `Failed to update: GitHub API error (${githubError.status}). Check GITHUB_TOKEN permissions.`
+                        message: `GitHub Sync Failed (${githubError.status}): Ensure the token has 'repo' scope, the repo name is correct ("owner/repo"), and the branch is "main".`
                     }, { status: 500 })
                 }
             }
