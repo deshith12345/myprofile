@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Download, ExternalLink, Github, Linkedin, Mail, Twitter } from 'lucide-react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { profile as ProfileType } from '@/data/profile'
 
