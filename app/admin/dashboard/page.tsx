@@ -59,7 +59,7 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
             const data = await res.json()
             if (data.success) {
                 onUpload(data.url)
-                // We keep the preview until the parent gives us a new currentFile
+                // We keep the previewUrl intentionally to avoid 404 flickering while Vercel redeploys
             } else {
                 alert(`Upload failed: ${data.message}`)
                 setPreviewUrl(null)
@@ -73,14 +73,15 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
         }
     }
 
-    // Effect to clear preview once the actual file update propagates
+    // Only clear local preview when we are absolutely sure the server image is back and loaded
+    // or if the component unmounts/resets
+    const [isServerImageLoaded, setIsServerImageLoaded] = useState(false)
+
     useEffect(() => {
-        if (currentFile && previewUrl) {
-            setPreviewUrl(null)
-        }
+        setIsServerImageLoaded(false)
     }, [currentFile])
 
-    const displayUrl = previewUrl || currentFile
+    const displayUrl = (!isServerImageLoaded && previewUrl) ? previewUrl : currentFile
     const isImage = displayUrl?.match(/\.(jpg|jpeg|png|gif|webp|blob:)/i) || previewUrl
 
     return (
@@ -111,7 +112,14 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
             {displayUrl ? (
                 <>
                     {isImage ? (
-                        <img src={displayUrl} alt="" className="w-full h-full object-cover" />
+                        <img
+                            src={displayUrl}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            onLoad={() => {
+                                if (displayUrl === currentFile) setIsServerImageLoaded(true)
+                            }}
+                        />
                     ) : (
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-50 dark:bg-gray-800">
                             <FileText className="w-8 h-8 mb-2" />
