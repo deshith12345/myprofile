@@ -29,7 +29,7 @@ export async function POST(request: Request) {
                 break
             case 'projects':
                 filePath = path.join(dataDir, 'projects.ts')
-                content = `export interface Project {\n  id: string\n  title: string\n  description: string\n  longDescription: string\n  image: string\n  images?: string[]\n  technologies: string[]\n  category: 'web' | 'mobile' | 'opensource' | 'other'\n  featured: boolean\n  liveUrl?: string\n  githubUrl?: string\n  date: string\n  highlights: string[]\n}\n\nexport const projects: Project[] = ${JSON.stringify(data, null, 2)}`
+                content = `export interface Project {\n  id: string\n  title: string\n  description: string\n  longDescription: string\n  image: string\n  images?: string[]\n  technologies: string[]\n  category: 'web' | 'mobile' | 'opensource' | 'other'\n  featured: boolean\n  liveUrl?: string\n  githubUrl?: string\n  date: string\n  highlights: string[]\n  role?: string\n  status?: string\n  challenges?: string[]\n}\n\nexport const projects: Project[] = ${JSON.stringify(data, null, 2)}`
                 break
             case 'achievements':
                 filePath = path.join(dataDir, 'achievements.ts')

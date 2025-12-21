@@ -12,6 +12,9 @@ export interface Project {
   githubUrl?: string
   date: string
   highlights: string[]
+  role?: string
+  status?: string
+  challenges?: string[]
 }
 
 export const projects: Project[] = [
