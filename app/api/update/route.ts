@@ -4,9 +4,8 @@ import fs from 'fs/promises'
 import path from 'path'
 import { Octokit } from 'octokit'
 
-const octokit = process.env.GITHUB_TOKEN ? new Octokit({ auth: process.env.GITHUB_TOKEN }) : null
-
 export async function POST(request: Request) {
+    const octokit = process.env.GITHUB_TOKEN ? new Octokit({ auth: process.env.GITHUB_TOKEN }) : null
     try {
         const session = await getSession()
         if (!session) {
