@@ -13,13 +13,12 @@ export async function GET(
         const db = await getDb()
 
         // 1. Try to find image in MongoDB
-        const image = await db.collection('images').findOne({
-            $or: [
-                { _id: ObjectId.isValid(id) ? new ObjectId(id) : null },
-                { name: id }
-            ]
-        })
+        const query: any = { $or: [{ name: id }] }
+        if (ObjectId.isValid(id)) {
+            query.$or.push({ _id: new ObjectId(id) })
+        }
 
+        const image = await db.collection('images').findOne(query)
         if (image && image.data) {
             const buffer = Buffer.from(image.data.buffer)
             return new NextResponse(buffer, {
