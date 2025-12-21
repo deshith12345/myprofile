@@ -34,7 +34,7 @@ import { findBrandIcon } from '@/lib/icon-utils'
 
 type Tab = 'profile' | 'skills' | 'projects' | 'achievements'
 
-function DropZone({ onUpload, currentFile, accept = 'image/*' }: { onUpload: (url: string) => void, currentFile?: string, accept?: string }) {
+function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' }: { onUpload: (url: string) => void, currentFile?: string, aspect?: 'video' | 'square', accept?: string }) {
     const [isDragging, setIsDragging] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -87,7 +87,8 @@ function DropZone({ onUpload, currentFile, accept = 'image/*' }: { onUpload: (ur
                 if (file) handleFile(file)
             }}
             onClick={() => fileInputRef.current?.click()}
-            className={`relative aspect-video w-full rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden group ${isDragging ? 'border-primary-500 bg-primary-500/10' : 'border-gray-200 dark:border-gray-700 hover:border-primary-500/50'
+            className={`relative w-full rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden group ${aspect === 'square' ? 'aspect-square' : 'aspect-video'
+                } ${isDragging ? 'border-primary-500 bg-primary-500/10' : 'border-gray-200 dark:border-gray-700 hover:border-primary-500/50'
                 }`}
         >
             <input
@@ -111,18 +112,29 @@ function DropZone({ onUpload, currentFile, accept = 'image/*' }: { onUpload: (ur
                         </div>
                     )}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Upload className="w-6 h-6 text-white" />
+                        <div className="flex flex-col items-center gap-2">
+                            <Upload className="w-5 h-5 text-white" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white">Change File</span>
+                        </div>
                     </div>
                 </>
             ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
-                    <Upload className="w-8 h-8 mb-2" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-center px-4">Drop File or Click</span>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 gap-3">
+                    <div className="p-3 rounded-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 group-hover:scale-110 transition-transform">
+                        <Upload className="w-6 h-6" />
+                    </div>
+                    <div className="text-center">
+                        <p className="text-[10px] font-black uppercase tracking-widest mb-1">Upload Asset</p>
+                        <p className="text-[9px] font-medium text-gray-500 dark:text-gray-500">Drag or click to choose</p>
+                    </div>
                 </div>
             )}
+
             {isUploading && (
-                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center">
-                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-20">
+                    <Loader2 className="w-6 h-6 text-white animate-spin mb-3" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white animate-pulse">Syncing to GitHub</span>
+                    <span className="text-[8px] font-medium text-gray-400 mt-1">This will trigger a site redeploy</span>
                 </div>
             )}
         </div>
@@ -301,6 +313,7 @@ export default function AdminDashboard() {
                                     <div className="max-w-[200px]">
                                         <DropZone
                                             currentFile={localProfile.image}
+                                            aspect="square"
                                             onUpload={(url) => setLocalProfile({ ...localProfile, image: url })}
                                         />
                                     </div>
