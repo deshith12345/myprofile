@@ -47,15 +47,23 @@ export interface Profile {
   name: string;
   title: string;
   tagline: string;
-  bio: string[];
+  bio: string;
+  longBio?: string;
   location: string;
   timezone: string;
   email: string;
-  photo: string;
-  resumeUrl: string;
+  image: string;
+  resume: string;
   socialLinks: SocialLink[];
-  availability: boolean;
+  available: boolean;
   availabilityText: string;
+  roles?: string[];
+  stats?: {
+    certifications: number;
+    securityAssessments: number;
+    vulnerabilitiesFound: number;
+    toolsMastered: number;
+  };
 }
 
 export interface BlogPost {
