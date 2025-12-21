@@ -85,7 +85,7 @@ export const skills: Skill[] = [
     "proficiency": 75,
     "icon": "javascript",
     "isBrandIcon": true,
-    "brandColor": "666666"
+    "brandColor": "F7DF1E"
   },
   {
     "name": "SQL",
@@ -112,18 +112,26 @@ export const skills: Skill[] = [
     "brandColor": "00599C"
   },
   {
-    "name": "microsoft powershell",
+    "name": "powershell",
     "category": "security-tools",
     "proficiency": 50,
-    "icon": "microsoftpowershell",
+    "icon": "powershell",
+    "isBrandIcon": true,
+    "brandColor": "5391FE"
+  },
+  {
+    "name": "zaproxy",
+    "category": "security-tools",
+    "proficiency": 50,
+    "icon": "zaproxy",
     "isBrandIcon": true,
     "brandColor": "666666"
   },
   {
-    "name": "zap",
+    "name": "Parrot OS",
     "category": "security-tools",
     "proficiency": 50,
-    "icon": "owaspzap",
+    "icon": "parrotos",
     "isBrandIcon": true,
     "brandColor": "666666"
   }
