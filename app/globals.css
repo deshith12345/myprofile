@@ -21,7 +21,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   /* Ensure main content doesn't overflow on mobile */
   main {
     overflow-x: hidden;
@@ -52,8 +52,11 @@
   @apply bg-gray-400 dark:bg-gray-500;
 }
 
-/* Smooth transitions for theme changes */
-* {
+/* Smooth transitions for theme changes - limited to body and common containers */
+body,
+.admin-hub-tab,
+.card,
+section {
   transition-property: background-color, border-color, color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
@@ -80,4 +83,3 @@
 .animate-delay-300 {
   animation-delay: 300ms;
 }
-

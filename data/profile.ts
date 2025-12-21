@@ -33,5 +33,6 @@ export const profile = {
     "securityAssessments": 15,
     "vulnerabilitiesFound": 50,
     "toolsMastered": 25
-  }
+  },
+  "roles": ["Cybersecurity Student", "Security Analyst", "Penetration Tester", "Threat Hunter"]
 }

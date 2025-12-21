@@ -175,22 +175,22 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#030711] flex flex-col md:flex-row">
-            <aside className="w-full md:w-64 bg-white dark:bg-gray-900 border-b md:border-r border-gray-200 dark:border-gray-800 p-6 flex flex-col">
-                <div className="flex items-center gap-3 mb-10 px-2">
+            <aside className="w-full md:w-64 bg-white dark:bg-gray-900 border-b md:border-r border-gray-200 dark:border-gray-800 p-4 md:p-6 flex flex-col shrink-0">
+                <div className="flex items-center gap-3 mb-6 md:mb-10 px-2">
                     <div className="p-2 rounded-lg bg-primary-600">
                         <LayoutDashboard className="w-5 h-5 text-white" />
                     </div>
                     <span className="font-black uppercase tracking-widest text-sm dark:text-white">Admin Hub</span>
                 </div>
 
-                <nav className="space-y-2 flex-1">
+                <nav className="flex md:flex-col gap-2 flex-1 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     {tabs.map((tab) => {
                         const Icon = tab.icon
                         return (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as Tab)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id
+                                className={`flex-none md:w-full flex items-center gap-3 px-4 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab.id
                                     ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 border border-primary-500/20'
                                     : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent'
                                     }`}
@@ -204,10 +204,11 @@ export default function AdminDashboard() {
 
                 <button
                     onClick={handleLogout}
-                    className="mt-auto flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
+                    className="mt-4 md:mt-auto flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
                 >
                     <LogOut className="w-4 h-4" />
-                    Disconnect
+                    <span className="hidden md:inline">Disconnect</span>
+                    <span className="md:hidden text-[10px] uppercase font-black tracking-widest">Logout</span>
                 </button>
             </aside>
 
@@ -321,6 +322,44 @@ export default function AdminDashboard() {
                                         className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm font-bold focus:ring-1 focus:ring-primary-500 outline-none transition-all"
                                     />
                                 </div>
+                                <div className="grid md:grid-cols-2 gap-8 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Contact Email</label>
+                                        <input
+                                            type="email"
+                                            value={localProfile.email}
+                                            onChange={(e) => setLocalProfile({ ...localProfile, email: e.target.value })}
+                                            className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 text-sm font-bold focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Resume Path (/CV/resume.pdf)</label>
+                                        <input
+                                            type="text"
+                                            value={localProfile.resume}
+                                            onChange={(e) => setLocalProfile({ ...localProfile, resume: e.target.value })}
+                                            className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 text-sm font-bold focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Location</label>
+                                        <input
+                                            type="text"
+                                            value={localProfile.location}
+                                            onChange={(e) => setLocalProfile({ ...localProfile, location: e.target.value })}
+                                            className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 text-sm font-bold focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Timezone</label>
+                                        <input
+                                            type="text"
+                                            value={localProfile.timezone}
+                                            onChange={(e) => setLocalProfile({ ...localProfile, timezone: e.target.value })}
+                                            className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 text-sm font-bold focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                                        />
+                                    </div>
+                                </div>
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Short Summary (Home Page)</label>
                                     <input
@@ -338,6 +377,43 @@ export default function AdminDashboard() {
                                         onChange={(e) => setLocalProfile({ ...localProfile, longBio: e.target.value })}
                                         className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm font-medium focus:ring-1 focus:ring-primary-500 outline-none resize-none leading-relaxed transition-all"
                                     />
+                                </div>
+                                <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Animated Titles (Hero)</label>
+                                        <Button size="sm" variant="outline" onClick={() => {
+                                            const updatedRoles = [...(localProfile.roles || [])]
+                                            updatedRoles.push('New Title')
+                                            setLocalProfile({ ...localProfile, roles: updatedRoles })
+                                        }} className="h-7 text-[10px] rounded-lg">
+                                            <Plus className="w-3 h-3 mr-1" /> Add Title
+                                        </Button>
+                                    </div>
+                                    <div className="grid gap-2">
+                                        {(localProfile.roles || []).map((role: string, ridx: number) => (
+                                            <div key={ridx} className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={role}
+                                                    onChange={(e) => {
+                                                        const updatedRoles = [...localProfile.roles]
+                                                        updatedRoles[ridx] = e.target.value
+                                                        setLocalProfile({ ...localProfile, roles: updatedRoles })
+                                                    }}
+                                                    className="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg px-3 py-2 text-xs font-bold focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        const updatedRoles = localProfile.roles.filter((_: any, i: number) => i !== ridx)
+                                                        setLocalProfile({ ...localProfile, roles: updatedRoles })
+                                                    }}
+                                                    className="p-2 text-red-500/50 hover:text-red-500 transition-colors"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         )}

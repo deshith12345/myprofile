@@ -8,9 +8,8 @@ import { profile } from '@/data/profile'
 import { scrollToElement } from '@/lib/utils'
 import Image from 'next/image'
 
-const roles = ['Cybersecurity Student', 'Security Analyst', 'Penetration Tester', 'Threat Hunter']
-
 export function Hero() {
+  const roles = profile.roles || ['Cybersecurity Student', 'Security Analyst', 'Penetration Tester', 'Threat Hunter']
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [displayText, setDisplayText] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
@@ -21,26 +20,30 @@ export function Hero() {
   }, [])
 
   useEffect(() => {
+    if (!roles || roles.length === 0) return
     const currentRole = roles[currentRoleIndex]
+    if (!currentRole) return
     let timeout: NodeJS.Timeout
 
     if (!isDeleting && displayText.length < currentRole.length) {
+      const typingSpeed = isClient && window.innerWidth < 768 ? 150 : 100
       timeout = setTimeout(() => {
         setDisplayText(currentRole.substring(0, displayText.length + 1))
-      }, 100)
+      }, typingSpeed)
     } else if (!isDeleting && displayText.length === currentRole.length) {
-      timeout = setTimeout(() => setIsDeleting(true), 2500) // Slightly longer pause
+      timeout = setTimeout(() => setIsDeleting(true), 2500)
     } else if (isDeleting && displayText.length > 0) {
+      const deletingSpeed = isClient && window.innerWidth < 768 ? 80 : 40
       timeout = setTimeout(() => {
         setDisplayText(currentRole.substring(0, displayText.length - 1))
-      }, 40) // Faster deletion
+      }, deletingSpeed)
     } else if (isDeleting && displayText.length === 0) {
       setIsDeleting(false)
       setCurrentRoleIndex((prev) => (prev + 1) % roles.length)
     }
 
     return () => clearTimeout(timeout)
-  }, [displayText, isDeleting, currentRoleIndex])
+  }, [displayText, isDeleting, currentRoleIndex, roles])
 
   const getIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
