@@ -62,19 +62,21 @@ export async function POST(request: Request) {
                         owner,
                         repo,
                         path: relativePath,
+                        ref: 'main' // Explicitly use main branch
                     })
                     if (!Array.isArray(currentFile)) {
                         currentFileSha = currentFile.sha
                     }
-                } catch (getShaError) {
-                    console.warn(`File ${relativePath} not found on GitHub, creating new file.`)
+                } catch (getShaError: any) {
+                    console.warn(`File ${relativePath} fetch failed (SHA): ${getShaError.status}. Creating/Updating anyway.`);
                 }
 
                 // Update or create the file on GitHub
-                await octokit.rest.repos.createOrUpdateFileContents({
+                const response = await octokit.rest.repos.createOrUpdateFileContents({
                     owner,
                     repo,
                     path: relativePath,
+                    branch: 'main', // Explicitly target main
                     message: `Admin Hub: Update ${type} data`,
                     content: Buffer.from(content).toString('base64'),
                     sha: currentFileSha,
@@ -87,6 +89,7 @@ export async function POST(request: Request) {
                         email: 'admin@portfolio.vercel.app',
                     },
                 })
+                console.log(`GitHub Sync Success: ${relativePath} [SHA: ${response.data.content?.sha}]`);
                 githubUpdateSuccess = true
             } catch (githubError: any) {
                 console.error('GitHub API Update Error:', githubError)
