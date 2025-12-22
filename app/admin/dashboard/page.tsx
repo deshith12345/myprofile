@@ -669,6 +669,37 @@ export default function AdminDashboard() {
                                                         <label className="text-[8px] font-black uppercase text-gray-500">Operation ID</label>
                                                         <div className="text-[10px] font-mono text-gray-400 bg-gray-100 dark:bg-gray-800/50 p-2 rounded-lg border border-gray-200 dark:border-gray-700 truncate">{project.id}</div>
                                                     </div>
+
+                                                    <div className="space-y-4">
+                                                        <label className="text-[8px] font-black uppercase text-gray-500 block">Mission Gallery (Multi-Image)</label>
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            {(project.images || []).map((img, imgIdx) => (
+                                                                <div key={imgIdx} className="relative aspect-video rounded-lg overflow-hidden group/img">
+                                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                    <img src={img} className="w-full h-full object-cover" />
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const updated = [...localProjects]
+                                                                            updated[idx].images = (updated[idx].images || []).filter((_, i) => i !== imgIdx)
+                                                                            setLocalProjects(updated)
+                                                                        }}
+                                                                        className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-md opacity-0 group-hover/img:opacity-100 transition-opacity"
+                                                                    >
+                                                                        <Trash2 className="w-3 h-3" />
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                            <div className="aspect-video">
+                                                                <DropZone
+                                                                    onUpload={(url) => {
+                                                                        const updated = [...localProjects]
+                                                                        updated[idx].images = [...(updated[idx].images || []), url]
+                                                                        setLocalProjects(updated)
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 <div className="md:col-span-8 space-y-6">
@@ -837,6 +868,8 @@ export default function AdminDashboard() {
                                                                 className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-primary-500 transition-all font-mono"
                                                             />
                                                         </div>
+                                                    </div>
+                                                    <div className="grid md:grid-cols-2 gap-8">
                                                         <div className="space-y-1">
                                                             <label className="text-[8px] font-black uppercase text-gray-500">Issuing Entity</label>
                                                             <input
@@ -848,6 +881,38 @@ export default function AdminDashboard() {
                                                                 }}
                                                                 className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-black text-primary-500 outline-none focus:border-primary-500 transition-all"
                                                             />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <label className="text-[8px] font-black uppercase text-gray-500">Organization Logo (Optional)</label>
+                                                            <div className="h-10 w-full flex gap-2">
+                                                                {achievement.organizationLogo && (
+                                                                    <div className="h-10 w-10 shrink-0 relative group/logo">
+                                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                        <img src={achievement.organizationLogo} className="h-full w-full object-contain rounded-md bg-white p-1" />
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                const updated = [...localAchievements]
+                                                                                updated[idx].organizationLogo = undefined
+                                                                                setLocalAchievements(updated)
+                                                                            }}
+                                                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover/logo:opacity-100 transition-opacity"
+                                                                        >
+                                                                            <X className="w-3 h-3" />
+                                                                        </button>
+                                                                    </div>
+                                                                )}
+                                                                <div className="h-10 w-10 shrink-0">
+                                                                    <DropZone
+                                                                        aspect="square"
+                                                                        currentFile={undefined}
+                                                                        onUpload={(url) => {
+                                                                            const updated = [...localAchievements]
+                                                                            updated[idx].organizationLogo = url
+                                                                            setLocalAchievements(updated)
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
 

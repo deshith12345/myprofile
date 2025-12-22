@@ -28,6 +28,7 @@ export interface Achievement {
   icon: string;
   verificationUrl?: string;
   certificateFile?: string;
+  organizationLogo?: string;
   category: AchievementCategory;
 }
 

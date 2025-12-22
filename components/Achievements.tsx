@@ -31,6 +31,15 @@ const organizationLogos: Record<string, string> = {
   "Splunk": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Splunk_logo.svg/2560px-Splunk_logo.svg.png",
   "Fortinet": "https://upload.wikimedia.org/wikipedia/commons/3/36/Fortinet_logo.svg",
   "LinkedIn Learning": "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png",
+  "Google": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
+  "Microsoft": "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg",
+  "AWS": "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
+  "Cisco": "https://upload.wikimedia.org/wikipedia/commons/0/08/Cisco_logo_blue_2016.svg",
+  "CompTIA": "https://upload.wikimedia.org/wikipedia/commons/a/a2/CompTIA_logo.svg",
+  "EC-Council": "https://upload.wikimedia.org/wikipedia/commons/0/09/EC-Council_logo.png",
+  "OffSec": "https://www.offsec.com/wp-content/uploads/2023/12/offsec-logo-light.svg",
+  "Udemy": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Udemy_logo.svg",
+  "Coursera": "https://upload.wikimedia.org/wikipedia/commons/9/97/Coursera-Logo_600x600.svg",
 }
 
 export function Achievements({ achievements }: { achievements: Achievement[] }) {
@@ -97,7 +106,7 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
             const Icon = categoryIcons[achievement.category]
             const isPDF = achievement.certificateFile?.toLowerCase().endsWith('.pdf')
             const isImage = achievement.certificateFile && !isPDF
-            const orgLogo = organizationLogos[achievement.organization]
+            const orgLogo = achievement.organizationLogo || organizationLogos[achievement.organization]
 
             return (
               <motion.div key={achievement.id} variants={itemVariants}>
