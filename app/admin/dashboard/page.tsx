@@ -35,7 +35,7 @@ import { findBrandIcon } from '@/lib/icon-utils'
 
 type Tab = 'profile' | 'skills' | 'projects' | 'achievements'
 
-function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' }: { onUpload: (url: string) => void, currentFile?: string, aspect?: 'video' | 'square', accept?: string }) {
+function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*', fallbackImage }: { onUpload: (url: string) => void, currentFile?: string, aspect?: 'video' | 'square', accept?: string, fallbackImage?: string }) {
     const [isDragging, setIsDragging] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -133,6 +133,17 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
                             <Upload className="w-5 h-5 text-white" />
                             <span className="text-[10px] font-black uppercase tracking-widest text-white">Change File</span>
                         </div>
+                    </div>
+                </>
+            ) : fallbackImage ? (
+                <>
+                    <div className="w-full h-full p-2 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={fallbackImage} className="max-w-full max-h-full object-contain opacity-50 grayscale" />
+                    </div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 gap-1 bg-white/50 dark:bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Upload className="w-5 h-5" />
+                        <span className="text-[8px] font-black uppercase">Override</span>
                     </div>
                 </>
             ) : (
@@ -529,19 +540,29 @@ export default function AdminDashboard() {
                                         <div key={idx} className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 group relative">
                                             <div className="grid md:grid-cols-4 gap-4 items-center">
                                                 <div className="md:col-span-1 flex items-center gap-4">
-                                                    <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden">
-                                                        {skill.isBrandIcon && skill.icon ? (
-                                                            /* eslint-disable-next-line @next/next/no-img-element */
-                                                            <img
-                                                                src={`https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}`}
-                                                                alt=""
-                                                                className="w-full h-full object-contain"
-                                                                onError={(e) => {
-                                                                    e.currentTarget.style.display = 'none';
+                                                    <div className="w-12 h-12 shrink-0 relative group/icon">
+                                                        <DropZone
+                                                            aspect="square"
+                                                            currentFile={skill.customLogo}
+                                                            fallbackImage={skill.isBrandIcon && skill.icon ? `https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}` : undefined}
+                                                            onUpload={(url) => {
+                                                                const updated = [...localSkills]
+                                                                updated[idx].customLogo = url
+                                                                setLocalSkills(updated)
+                                                            }}
+                                                        />
+                                                        {skill.customLogo && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    const updated = [...localSkills]
+                                                                    updated[idx].customLogo = undefined
+                                                                    setLocalSkills(updated)
                                                                 }}
-                                                            />
-                                                        ) : (
-                                                            <div className="text-gray-400 text-[8px] font-black uppercase text-center leading-tight">No<br />Icon</div>
+                                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover/icon:opacity-100 transition-opacity z-10"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
                                                         )}
                                                     </div>
                                                     <div className="flex-1 space-y-1">
