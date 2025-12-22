@@ -5,10 +5,15 @@ import { Badge } from '@/data/types'
 import { ExternalLink } from 'lucide-react'
 
 export function Badges({ badges }: { badges: Badge[] }) {
-    if (!badges || badges.length === 0) return null
+    if (!badges) return null
+
+    // Filter out badges without images to prevent "fake" empty boxes
+    const validBadges = badges.filter(b => b.image && b.image.trim() !== '')
+
+    if (validBadges.length === 0) return null
 
     // Duplicate list to create seamless loop
-    const duplicatedBadges = [...badges, ...badges, ...badges, ...badges]
+    const duplicatedBadges = [...validBadges, ...validBadges, ...validBadges, ...validBadges]
 
     return (
         <section className="py-12 bg-gray-50 dark:bg-[#030711] overflow-hidden border-t border-gray-100 dark:border-gray-800">
@@ -26,13 +31,13 @@ export function Badges({ badges }: { badges: Badge[] }) {
                 <motion.div
                     className="flex gap-8 md:gap-12 flex-nowrap py-4"
                     animate={{
-                        x: [0, -1000], // Approximate distance, will adjust with duration
+                        x: "-50%",
                     }}
                     transition={{
                         x: {
                             repeat: Infinity,
                             repeatType: "loop",
-                            duration: 30, // Adjust speed here
+                            duration: 15, // Faster speed as requested
                             ease: "linear",
                         },
                     }}
