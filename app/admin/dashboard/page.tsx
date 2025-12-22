@@ -682,7 +682,7 @@ export default function AdminDashboard() {
                                                             {(project.images || []).map((img, imgIdx) => (
                                                                 <div key={imgIdx} className="relative aspect-video rounded-lg overflow-hidden group/img">
                                                                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                                    <img src={img} className="w-full h-full object-cover" />
+                                                                    <img src={img} alt={`Project gallery image ${imgIdx + 1}`} className="w-full h-full object-cover" />
                                                                     <button
                                                                         onClick={() => {
                                                                             const updated = [...localProjects]
@@ -1012,7 +1012,7 @@ export default function AdminDashboard() {
                                     <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
                                         <CheckCircle2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                                         <p className="text-gray-500 font-medium">No badges added yet</p>
-                                        <p className="text-xs text-gray-400 mt-1">Click "Add Badge" to get started</p>
+                                        <p className="text-xs text-gray-400 mt-1">Click &quot;Add Badge&quot; to get started</p>
                                     </div>
                                 )}
                             </div>
