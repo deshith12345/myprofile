@@ -32,7 +32,7 @@ import { projects as projectsData } from '@/data/projects'
 import { achievements as achievementsData } from '@/data/achievements'
 import { badges as badgesData } from '@/data/badges'
 import { Skill, Project, Achievement, Profile, Badge } from '@/data/types'
-import { findBrandIcon } from '@/lib/icon-utils'
+import { findBrandIcon, findOrganizationIcon } from '@/lib/icon-utils'
 
 
 type Tab = 'profile' | 'skills' | 'projects' | 'achievements' | 'badges'
@@ -874,6 +874,57 @@ export default function AdminDashboard() {
                                                                 className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-primary-500 transition-all font-mono"
                                                             />
                                                         </div>
+                                                        <div className="space-y-1">
+                                                            <label className="text-[8px] font-black uppercase text-gray-500">Issuing Organization</label>
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden shrink-0">
+                                                                    {achievement.orgIconSlug ? (
+                                                                        /* eslint-disable-next-line @next/next/no-img-element */
+                                                                        <img
+                                                                            src={`https://cdn.simpleicons.org/${achievement.orgIconSlug}/${achievement.orgIconColor || '666666'}`}
+                                                                            alt=""
+                                                                            className="w-full h-full object-contain"
+                                                                            onError={(e) => {
+                                                                                e.currentTarget.style.display = 'none';
+                                                                            }}
+                                                                        />
+                                                                    ) : (
+                                                                        <Award className="w-5 h-5 text-gray-400" />
+                                                                    )}
+                                                                </div>
+                                                                <input
+                                                                    value={achievement.organization}
+                                                                    onBlur={() => {
+                                                                        // Auto-detect organization icon
+                                                                        const iconData = findOrganizationIcon(achievement.organization);
+                                                                        const updated = [...localAchievements];
+                                                                        updated[idx].orgIconSlug = iconData.slug;
+                                                                        updated[idx].orgIconColor = iconData.color;
+                                                                        setLocalAchievements(updated);
+                                                                    }}
+                                                                    onChange={(e) => {
+                                                                        const updated = [...localAchievements]
+                                                                        updated[idx].organization = e.target.value
+                                                                        setLocalAchievements(updated)
+                                                                    }}
+                                                                    placeholder="e.g., CompTIA, Cisco, IBM"
+                                                                    className="flex-1 bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-primary-500 transition-all"
+                                                                />
+                                                                <button
+                                                                    title="Auto-detect Organization Logo"
+                                                                    onClick={() => {
+                                                                        const iconData = findOrganizationIcon(achievement.organization);
+                                                                        const updated = [...localAchievements];
+                                                                        updated[idx].orgIconSlug = iconData.slug;
+                                                                        updated[idx].orgIconColor = iconData.color;
+                                                                        setLocalAchievements(updated);
+                                                                    }}
+                                                                    className="p-1.5 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                                                                >
+                                                                    <Wand2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
                                                     <div className="grid md:grid-cols-2 gap-8">
@@ -902,6 +953,8 @@ export default function AdminDashboard() {
                                                             >
                                                                 <option value="certification">Certification</option>
                                                                 <option value="award">Award</option>
+                                                                <option value="event">Event</option>
+                                                                <option value="article">Article</option>
                                                                 <option value="publication">Publication</option>
                                                                 <option value="speaking">Speaking</option>
                                                             </select>

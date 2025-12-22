@@ -29,9 +29,11 @@ export interface Achievement {
   verificationUrl?: string;
   certificateFile?: string;
   category: AchievementCategory;
+  orgIconSlug?: string;
+  orgIconColor?: string;
 }
 
-export type AchievementCategory = 'award' | 'certification' | 'publication' | 'speaking';
+export type AchievementCategory = 'award' | 'certification' | 'publication' | 'speaking' | 'event' | 'article';
 
 export interface Skill {
   name: string;

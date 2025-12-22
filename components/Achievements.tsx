@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Award, BookOpen, Cloud, Github, Mic, Trophy, ExternalLink } from 'lucide-react'
+import { Award, BookOpen, Calendar, Cloud, FileText, Github, Mic, Newspaper, Trophy, ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -16,6 +16,8 @@ const categoryIcons: Record<AchievementCategory, LucideIcon> = {
   certification: Award,
   publication: BookOpen,
   speaking: Mic,
+  event: Calendar,
+  article: Newspaper,
 }
 
 const categoryLabels: Record<AchievementCategory, string> = {
@@ -23,7 +25,19 @@ const categoryLabels: Record<AchievementCategory, string> = {
   certification: 'Certification',
   publication: 'Publication',
   speaking: 'Speaking',
+  event: 'Event',
+  article: 'Article',
 }
+
+const filterTabs: { id: AchievementCategory | 'all'; label: string; icon: LucideIcon }[] = [
+  { id: 'all', label: 'All', icon: Award },
+  { id: 'certification', label: 'Certifications', icon: Award },
+  { id: 'award', label: 'Awards', icon: Trophy },
+  { id: 'event', label: 'Events', icon: Calendar },
+  { id: 'article', label: 'Articles', icon: Newspaper },
+  { id: 'publication', label: 'Publications', icon: BookOpen },
+  { id: 'speaking', label: 'Speaking', icon: Mic },
+]
 
 const organizationLogos: Record<string, string> = {
   "(ISC)²": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/ISC2_Logo.svg/1200px-ISC2_Logo.svg.png",
@@ -42,33 +56,61 @@ const organizationLogos: Record<string, string> = {
   "Coursera": "https://upload.wikimedia.org/wikipedia/commons/9/97/Coursera-Logo_600x600.svg",
 }
 
-function AchievementLogo({ orgLogo, organization, Icon }: { orgLogo?: string, organization: string, Icon: LucideIcon }) {
+function AchievementLogo({ achievement, Icon }: { achievement: Achievement, Icon: LucideIcon }) {
   const [error, setError] = useState(false)
 
-  if (orgLogo && !error) {
+  // 1. Try the dynamically stored orgIconSlug first
+  if (achievement.orgIconSlug && !error) {
     return (
       /* eslint-disable-next-line @next/next/no-img-element */
       <img
-        src={orgLogo}
-        alt={organization}
+        src={`https://cdn.simpleicons.org/${achievement.orgIconSlug}/${achievement.orgIconColor || '666666'}`}
+        alt={achievement.organization}
         className="w-full h-full object-contain"
         onError={() => setError(true)}
       />
     )
   }
 
+  // 2. Fallback to hardcoded organizationLogos map
+  const orgLogo = organizationLogos[achievement.organization]
+  if (orgLogo && !error) {
+    return (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        src={orgLogo}
+        alt={achievement.organization}
+        className="w-full h-full object-contain"
+        onError={() => setError(true)}
+      />
+    )
+  }
+
+  // 3. Fallback to category icon
   return <Icon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
 }
 
 export function Achievements({ achievements }: { achievements: Achievement[] }) {
   const [selectedCertificate, setSelectedCertificate] = useState<Achievement | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [activeCategory, setActiveCategory] = useState<AchievementCategory | 'all'>('all')
 
   const handleCertificateClick = (achievement: Achievement) => {
     if (achievement.certificateFile) {
       setSelectedCertificate(achievement)
       setIsModalOpen(true)
     }
+  }
+
+  // Filter achievements based on selected category
+  const filteredAchievements = activeCategory === 'all'
+    ? achievements
+    : achievements.filter(a => a.category === activeCategory)
+
+  // Get count for each category
+  const getCategoryCount = (category: AchievementCategory | 'all') => {
+    if (category === 'all') return achievements.length
+    return achievements.filter(a => a.category === category).length
   }
 
   const containerVariants = {
@@ -103,7 +145,7 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
             Achievements & <span className="gradient-text">Recognition</span>
@@ -113,6 +155,50 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
           </p>
         </motion.div>
 
+        {/* Category Filter Tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="flex overflow-x-auto pb-2 md:pb-0 md:flex-wrap md:justify-center gap-2 mb-12 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0"
+        >
+          {filterTabs.map((tab) => {
+            const count = getCategoryCount(tab.id)
+            const isActive = activeCategory === tab.id
+            const TabIcon = tab.icon
+
+            // Skip tabs with no items (except 'all')
+            if (count === 0 && tab.id !== 'all') return null
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveCategory(tab.id)}
+                className={`
+                  group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                  ${isActive
+                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25'
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 border border-gray-200 dark:border-gray-700'
+                  }
+                `}
+              >
+                <TabIcon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-primary-500'}`} />
+                <span>{tab.label}</span>
+                <span className={`
+                  px-2 py-0.5 rounded-full text-xs font-bold
+                  ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                  }
+                `}>
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+        </motion.div>
+
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -120,11 +206,10 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
           viewport={{ once: true }}
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {achievements.map((achievement) => {
+          {filteredAchievements.map((achievement) => {
             const Icon = categoryIcons[achievement.category]
             const isPDF = achievement.certificateFile?.toLowerCase().endsWith('.pdf')
             const isImage = achievement.certificateFile && !isPDF
-            const orgLogo = organizationLogos[achievement.organization]
 
             return (
               <motion.div key={achievement.id} variants={itemVariants}>
@@ -166,8 +251,7 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
                       <div className="flex items-center gap-2">
                         <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg overflow-hidden h-10 w-10 flex items-center justify-center relative">
                           <AchievementLogo
-                            orgLogo={orgLogo}
-                            organization={achievement.organization}
+                            achievement={achievement}
                             Icon={Icon}
                           />
                         </div>

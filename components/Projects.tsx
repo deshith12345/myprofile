@@ -89,20 +89,22 @@ export function Projects({ projects: projectsData }: { projects: Project[] }) {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-4 mb-12"
         >
-          {/* Filters */}
-          <div className="flex flex-wrap justify-center gap-2">
-            {filters.map((filterOption) => (
-              <button
-                key={filterOption.value}
-                onClick={() => setFilter(filterOption.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${filter === filterOption.value
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                  }`}
-              >
-                {filterOption.label}
-              </button>
-            ))}
+          {/* Filters - horizontally scrollable on mobile */}
+          <div className="w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+            <div className="flex gap-2 sm:flex-wrap sm:justify-center min-w-max sm:min-w-0">
+              {filters.map((filterOption) => (
+                <button
+                  key={filterOption.value}
+                  onClick={() => setFilter(filterOption.value)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${filter === filterOption.value
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    }`}
+                >
+                  {filterOption.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Sort */}
