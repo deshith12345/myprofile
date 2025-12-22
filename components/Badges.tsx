@@ -52,7 +52,7 @@ export function Badges({ badges }: { badges: Badge[] }) {
                             <img
                                 src={badge.image}
                                 alt={badge.name}
-                                className="w-full h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                                className="w-full h-full object-contain"
                             />
                         </div>
                     ))}
