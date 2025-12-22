@@ -36,11 +36,13 @@ const iconMap: { [key: string]: any } = {
 function SkillCard({ skill }: { skill: Skill }) {
   const [imgError, setImgError] = useState(false)
 
+  const [prevUrl, setPrevUrl] = useState<string | null>(null)
+
   const isBrand = skill.isBrandIcon && skill.icon
   const brandIconUrl = isBrand ? `https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}` : null
 
-  // Reset error state if url changes
-  if (brandIconUrl && imgError && brandIconUrl !== skill.icon) {
+  if (brandIconUrl !== prevUrl) {
+    setPrevUrl(brandIconUrl)
     setImgError(false)
   }
 

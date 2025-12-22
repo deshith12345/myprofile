@@ -184,13 +184,12 @@ export function ProjectCard({ project, onClick, priority = false }: ProjectCardP
 
             <Button
               size="sm"
-              variant="ghost"
               onClick={onClick}
-              className="flex-1 min-w-0"
+              className="flex-1 min-w-0 bg-blue-600 hover:bg-blue-700 text-white border-transparent shadow-sm transition-all duration-200"
               aria-label={`View detailed information about ${project.title}`}
               title="View project details"
             >
-              <span className="truncate">Details</span>
+              <span className="truncate font-semibold">Details</span>
             </Button>
           </div>
         </div>

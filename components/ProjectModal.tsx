@@ -23,10 +23,15 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
 
   const images = useMemo(() => {
     if (!project) return []
+    const imgs = [project.image]
     if (Array.isArray((project as any).images) && (project as any).images.length > 0) {
-      return (project as any).images as string[]
+      const gallery = (project as any).images as string[]
+      // Add gallery images, ensuring we don't duplicate the cover if it's identical
+      gallery.forEach(img => {
+        if (img !== project.image) imgs.push(img)
+      })
     }
-    return project.image ? [project.image] : []
+    return imgs
   }, [project])
 
   useEffect(() => {
