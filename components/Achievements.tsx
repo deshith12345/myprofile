@@ -25,6 +25,14 @@ const categoryLabels: Record<AchievementCategory, string> = {
   speaking: 'Speaking',
 }
 
+const organizationLogos: Record<string, string> = {
+  "(ISC)²": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/ISC2_Logo.svg/1200px-ISC2_Logo.svg.png",
+  "IBM": "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg",
+  "Splunk": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Splunk_logo.svg/2560px-Splunk_logo.svg.png",
+  "Fortinet": "https://upload.wikimedia.org/wikipedia/commons/3/36/Fortinet_logo.svg",
+  "LinkedIn Learning": "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png",
+}
+
 export function Achievements({ achievements }: { achievements: Achievement[] }) {
   const [selectedCertificate, setSelectedCertificate] = useState<Achievement | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -89,6 +97,7 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
             const Icon = categoryIcons[achievement.category]
             const isPDF = achievement.certificateFile?.toLowerCase().endsWith('.pdf')
             const isImage = achievement.certificateFile && !isPDF
+            const orgLogo = organizationLogos[achievement.organization]
 
             return (
               <motion.div key={achievement.id} variants={itemVariants}>
@@ -127,12 +136,23 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
 
                   <div className="flex flex-col flex-1 p-4">
                     <div className="flex items-start justify-between mb-3">
-                      <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                        <Icon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg overflow-hidden h-10 w-10 flex items-center justify-center relative">
+                          {orgLogo ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img
+                              src={orgLogo}
+                              alt={achievement.organization}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <Icon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+                          )}
+                        </div>
+                        <Badge variant="primary" className="ml-2">
+                          {categoryLabels[achievement.category]}
+                        </Badge>
                       </div>
-                      <Badge variant="primary">
-                        {categoryLabels[achievement.category]}
-                      </Badge>
                     </div>
 
                     <h3 className="text-xl font-bold mb-2">{achievement.title}</h3>

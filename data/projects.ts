@@ -5,6 +5,11 @@ export const projects = [
     "description": "A PHP project",
     "longDescription": "A PHP project available on GitHub.",
     "image": "/images/projects/nebula.jpg",
+    "images": [
+      "/images/projects/nebula.jpg",
+      "/images/projects/nebula.jpg",
+      "/images/projects/nebula.jpg"
+    ],
     "technologies": [
       "PHP",
       "Hack"
@@ -16,6 +21,10 @@ export const projects = [
     "date": "2025-12-12",
     "highlights": [
       "Active development"
+    ],
+    "challenges": [
+      "Implementing secure authentication mechanisms in a custom PHP framework.",
+      " optimizing database queries for high-volume traffic."
     ]
   },
   {
@@ -24,6 +33,11 @@ export const projects = [
     "description": "A comprehensive password security toolkit with strength checker, breach checker, and password generator.",
     "longDescription": "A comprehensive password security toolkit with strength checker, breach checker, and password generator.\n\nThis project is available on GitHub with 0 stars and 0 forks.",
     "image": "/images/projects/hawk.jpg",
+    "images": [
+      "/images/projects/hawk.jpg",
+      "/images/projects/hawk.jpg",
+      "/images/projects/hawk.jpg"
+    ],
     "technologies": [
       "CSS",
       "JavaScript",
@@ -37,6 +51,10 @@ export const projects = [
     "highlights": [
       "Active development",
       "A comprehensive password security toolkit"
+    ],
+    "challenges": [
+      "Creating a robust password strength calculation algorithm completely client-side.",
+      "Ensuring the breach checker API integration was secure and respected rate limits."
     ]
   },
   {
@@ -45,6 +63,11 @@ export const projects = [
     "description": "A JavaScript project",
     "longDescription": "A JavaScript project available on GitHub.",
     "image": "/images/projects/metadata.jpg",
+    "images": [
+      "/images/projects/metadata.jpg",
+      "/images/projects/metadata.jpg",
+      "/images/projects/metadata.jpg"
+    ],
     "technologies": [
       "JavaScript",
       "CSS",
@@ -57,6 +80,10 @@ export const projects = [
     "date": "2025-11-25",
     "highlights": [
       "Active development"
+    ],
+    "challenges": [
+      "Handling various image formats and extracting EXIF data accurately.",
+      "Building a responsive UI that works well on mobile devices for image uploads."
     ]
   }
 ]

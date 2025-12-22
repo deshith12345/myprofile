@@ -61,7 +61,7 @@ export function Header({ profile }: { profile: Profile }) {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || isMobileMenuOpen
         ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-md'
         : 'bg-transparent'
         }`}
@@ -74,7 +74,7 @@ export function Header({ profile }: { profile: Profile }) {
             className="text-xl md:text-2xl font-bold gradient-text"
             aria-label="Back to top"
           >
-            {profile.name.split(' ')[0]}
+            {profile.name}
           </button>
 
           {/* Desktop Navigation */}
