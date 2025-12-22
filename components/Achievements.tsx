@@ -57,39 +57,43 @@ const organizationLogos: Record<string, string> = {
 }
 
 function AchievementLogo({ achievement, Icon }: { achievement: Achievement, Icon: LucideIcon }) {
-  const [simpleIconError, setSimpleIconError] = useState(false)
-  const [hardcodedLogoError, setHardcodedLogoError] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   const orgLogo = organizationLogos[achievement.organization]
+  const simpleIconUrl = achievement.orgIconSlug
+    ? `https://cdn.simpleicons.org/${achievement.orgIconSlug}/${achievement.orgIconColor || '666666'}`
+    : null
 
-  // 1. Try the dynamically stored orgIconSlug first
-  if (achievement.orgIconSlug && !simpleIconError) {
-    return (
-      /* eslint-disable-next-line @next/next/no-img-element */
-      <img
-        src={`https://cdn.simpleicons.org/${achievement.orgIconSlug}/${achievement.orgIconColor || '666666'}`}
-        alt={achievement.organization}
-        className="w-full h-full object-contain"
-        onError={() => setSimpleIconError(true)}
-      />
-    )
+  // Determine which image source to use
+  const imageSrc = simpleIconUrl || orgLogo
+
+  // If no image source at all, just show the icon
+  if (!imageSrc) {
+    return <Icon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
   }
 
-  // 2. Fallback to hardcoded organizationLogos map
-  if (orgLogo && !hardcodedLogoError) {
-    return (
-      /* eslint-disable-next-line @next/next/no-img-element */
-      <img
-        src={orgLogo}
-        alt={achievement.organization}
-        className="w-full h-full object-contain"
-        onError={() => setHardcodedLogoError(true)}
-      />
-    )
-  }
+  return (
+    <div className="relative w-full h-full flex items-center justify-center">
+      {/* Fallback icon - always rendered behind */}
+      <Icon className={`h-5 w-5 text-primary-600 dark:text-primary-400 ${imageLoaded && !imageError ? 'opacity-0' : 'opacity-100'} transition-opacity`} />
 
-  // 3. Fallback to category icon (always works)
-  return <Icon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+      {/* Image overlay - only visible when loaded successfully */}
+      {!imageError && (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={imageSrc}
+          alt={achievement.organization}
+          className={`absolute inset-0 w-full h-full object-contain ${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity`}
+          onLoad={() => setImageLoaded(true)}
+          onError={() => {
+            setImageError(true)
+            setImageLoaded(false)
+          }}
+        />
+      )}
+    </div>
+  )
 }
 
 export function Achievements({ achievements }: { achievements: Achievement[] }) {
