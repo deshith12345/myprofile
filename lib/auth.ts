@@ -23,7 +23,13 @@ export async function decrypt(input: string): Promise<any> {
 export async function getSession() {
     const session = cookies().get('admin_session')?.value
     if (!session) return null
-    return await decrypt(session)
+    try {
+        return await decrypt(session)
+    } catch (error) {
+        // Token expired or invalid - return null to trigger re-authentication
+        console.warn('Session validation failed:', error)
+        return null
+    }
 }
 
 export async function updateSession(request: NextRequest) {
