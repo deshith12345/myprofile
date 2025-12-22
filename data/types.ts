@@ -83,5 +83,13 @@ export interface BlogPost {
   featured?: boolean;
 }
 
+export interface Badge {
+  id: string;
+  name: string;
+  image: string;
+  provider?: string;
+  url?: string;
+}
+
 
 

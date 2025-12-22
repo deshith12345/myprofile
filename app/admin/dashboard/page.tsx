@@ -30,10 +30,12 @@ import { profile } from '@/data/profile'
 import { skills as skillsData } from '@/data/skills'
 import { projects as projectsData } from '@/data/projects'
 import { achievements as achievementsData } from '@/data/achievements'
-import { Skill, Project, Achievement, Profile } from '@/data/types'
+import { badges as badgesData } from '@/data/badges'
+import { Skill, Project, Achievement, Profile, Badge } from '@/data/types'
 import { findBrandIcon } from '@/lib/icon-utils'
 
-type Tab = 'profile' | 'skills' | 'projects' | 'achievements'
+
+type Tab = 'profile' | 'skills' | 'projects' | 'achievements' | 'badges'
 
 function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' }: { onUpload: (url: string) => void, currentFile?: string, aspect?: 'video' | 'square', accept?: string }) {
     const [isDragging, setIsDragging] = useState(false)
@@ -168,6 +170,7 @@ export default function AdminDashboard() {
     const [localSkills, setLocalSkills] = useState<Skill[]>([...(skillsData as unknown as Skill[])])
     const [localProjects, setLocalProjects] = useState<Project[]>([...(projectsData as unknown as Project[])])
     const [localAchievements, setLocalAchievements] = useState<Achievement[]>([...(achievementsData as unknown as Achievement[])])
+    const [localBadges, setLocalBadges] = useState<Badge[]>([...(badgesData as unknown as Badge[])])
     useEffect(() => {
         const fetchAllData = async () => {
             try {
@@ -178,6 +181,7 @@ export default function AdminDashboard() {
                     setLocalSkills(result.data.skills)
                     setLocalProjects(result.data.projects)
                     setLocalAchievements(result.data.achievements)
+                    setLocalBadges(result.data.badges || [])
                 }
             } catch (err) {
                 console.error('Failed to pre-fetch database data:', err)
@@ -195,6 +199,7 @@ export default function AdminDashboard() {
         { id: 'skills', label: 'Skills', icon: Award },
         { id: 'projects', label: 'Projects', icon: Briefcase },
         { id: 'achievements', label: 'Certifications', icon: Award },
+        { id: 'badges', label: 'Badges', icon: CheckCircle2 },
     ]
 
     const handleLogout = async () => {
@@ -211,6 +216,7 @@ export default function AdminDashboard() {
             { type: 'skills', data: localSkills },
             { type: 'projects', data: localProjects },
             { type: 'achievements', data: localAchievements },
+            { type: 'badges', data: localBadges },
         ]
 
         try {
@@ -920,6 +926,95 @@ export default function AdminDashboard() {
                                         </Card>
                                     ))}
                                 </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'badges' && (
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-center mb-6">
+                                    <div>
+                                        <h2 className="text-2xl font-black text-gray-900 dark:text-white">Digital Badges</h2>
+                                        <p className="text-sm text-gray-500">Manage credentials and badges displayed in the marquee.</p>
+                                    </div>
+                                    <Button onClick={() => setLocalBadges([...localBadges, {
+                                        id: `badge-${Date.now()}`,
+                                        name: 'New Badge',
+                                        image: '',
+                                        provider: 'Provider Name',
+                                    }])} icon={Plus}>Add Badge</Button>
+                                </div>
+
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {localBadges.map((badge, idx) => (
+                                        <div key={badge.id} className="group relative bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
+                                            <button
+                                                onClick={() => {
+                                                    const updated = localBadges.filter((_, i) => i !== idx)
+                                                    setLocalBadges(updated)
+                                                }}
+                                                className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-600"
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                            </button>
+
+                                            <div className="space-y-3">
+                                                <div className="aspect-square w-full">
+                                                    <DropZone
+                                                        aspect="square"
+                                                        currentFile={badge.image}
+                                                        onUpload={(url) => {
+                                                            const updated = [...localBadges]
+                                                            updated[idx].image = url
+                                                            setLocalBadges(updated)
+                                                        }}
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <input
+                                                        value={badge.name}
+                                                        onChange={(e) => {
+                                                            const updated = [...localBadges]
+                                                            updated[idx].name = e.target.value
+                                                            setLocalBadges(updated)
+                                                        }}
+                                                        placeholder="Badge Name"
+                                                        className="w-full bg-transparent text-sm font-bold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 focus:border-primary-500 outline-none pb-1"
+                                                    />
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <input
+                                                            value={badge.provider || ''}
+                                                            onChange={(e) => {
+                                                                const updated = [...localBadges]
+                                                                updated[idx].provider = e.target.value
+                                                                setLocalBadges(updated)
+                                                            }}
+                                                            placeholder="Provider"
+                                                            className="w-full bg-transparent text-xs text-gray-500 border-b border-gray-200 dark:border-gray-700 focus:border-primary-500 outline-none pb-1"
+                                                        />
+                                                        <input
+                                                            value={badge.url || ''}
+                                                            onChange={(e) => {
+                                                                const updated = [...localBadges]
+                                                                updated[idx].url = e.target.value
+                                                                setLocalBadges(updated)
+                                                            }}
+                                                            placeholder="Link URL"
+                                                            className="w-full bg-transparent text-xs text-blue-500 border-b border-gray-200 dark:border-gray-700 focus:border-primary-500 outline-none pb-1"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {localBadges.length === 0 && (
+                                    <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+                                        <CheckCircle2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                                        <p className="text-gray-500 font-medium">No badges added yet</p>
+                                        <p className="text-xs text-gray-400 mt-1">Click "Add Badge" to get started</p>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </motion.div>

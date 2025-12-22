@@ -16,6 +16,8 @@ import { profile as defaultProfile } from '@/data/profile'
 import { projects as defaultProjects } from '@/data/projects'
 import { skills as defaultSkills } from '@/data/skills'
 import { achievements as defaultAchievements } from '@/data/achievements'
+import { badges as defaultBadges } from '@/data/badges'
+import { Badges } from '@/components/Badges'
 
 async function getData() {
   try {
@@ -32,6 +34,7 @@ async function getData() {
       projects: dataMap.projects || defaultProjects,
       skills: dataMap.skills || defaultSkills,
       achievements: dataMap.achievements || defaultAchievements,
+      badges: dataMap.badges || defaultBadges,
     }
   } catch (error) {
     console.error('Failed to fetch data from MongoDB, using fallbacks:', error)
@@ -40,12 +43,13 @@ async function getData() {
       projects: defaultProjects,
       skills: defaultSkills,
       achievements: defaultAchievements,
+      badges: defaultBadges,
     }
   }
 }
 
 export default async function Home() {
-  const { profile, projects, skills, achievements } = await getData()
+  const { profile, projects, skills, achievements, badges } = await getData()
 
   return (
     <main className="min-h-screen">
@@ -55,6 +59,7 @@ export default async function Home() {
       <About skills={skills} />
       <Projects projects={projects} />
       <Achievements achievements={achievements} />
+      <Badges badges={badges} />
       <Contact profile={profile} />
       <Footer profile={profile} />
     </main>
