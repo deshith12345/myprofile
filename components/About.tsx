@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Shield,
@@ -33,9 +34,16 @@ const iconMap: { [key: string]: any } = {
 }
 
 function SkillCard({ skill }: { skill: Skill }) {
+  const [imgError, setImgError] = useState(false)
+
   const isBrand = skill.isBrandIcon && skill.icon
   const brandIconUrl = isBrand ? `https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}` : null
-  const displayIconUrl = skill.customLogo || brandIconUrl
+
+  // Reset error state if url changes
+  if (brandIconUrl && imgError && brandIconUrl !== skill.icon) {
+    setImgError(false)
+  }
+
   const FallbackIcon = skill.icon && iconMap[skill.icon] ? iconMap[skill.icon] : Shield
 
   return (
@@ -47,15 +55,13 @@ function SkillCard({ skill }: { skill: Skill }) {
       className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:border-primary-500/30 transition-all duration-300"
     >
       <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 p-2">
-        {displayIconUrl ? (
+        {brandIconUrl && !imgError ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
-            src={displayIconUrl}
+            src={brandIconUrl}
             alt={skill.name}
             className="w-full h-full object-contain"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none'
-            }}
+            onError={() => setImgError(true)}
           />
         ) : (
           <FallbackIcon className="w-full h-full text-primary-500" />

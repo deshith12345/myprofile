@@ -28,7 +28,6 @@ export interface Achievement {
   icon: string;
   verificationUrl?: string;
   certificateFile?: string;
-  organizationLogo?: string;
   category: AchievementCategory;
 }
 
@@ -41,7 +40,6 @@ export interface Skill {
   icon?: string;
   isBrandIcon?: boolean;
   brandColor?: string;
-  customLogo?: string;
 }
 
 export interface SocialLink {

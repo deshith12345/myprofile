@@ -42,6 +42,24 @@ const organizationLogos: Record<string, string> = {
   "Coursera": "https://upload.wikimedia.org/wikipedia/commons/9/97/Coursera-Logo_600x600.svg",
 }
 
+function AchievementLogo({ orgLogo, organization, Icon }: { orgLogo?: string, organization: string, Icon: LucideIcon }) {
+  const [error, setError] = useState(false)
+
+  if (orgLogo && !error) {
+    return (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        src={orgLogo}
+        alt={organization}
+        className="w-full h-full object-contain"
+        onError={() => setError(true)}
+      />
+    )
+  }
+
+  return <Icon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+}
+
 export function Achievements({ achievements }: { achievements: Achievement[] }) {
   const [selectedCertificate, setSelectedCertificate] = useState<Achievement | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -106,7 +124,7 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
             const Icon = categoryIcons[achievement.category]
             const isPDF = achievement.certificateFile?.toLowerCase().endsWith('.pdf')
             const isImage = achievement.certificateFile && !isPDF
-            const orgLogo = achievement.organizationLogo || organizationLogos[achievement.organization]
+            const orgLogo = organizationLogos[achievement.organization]
 
             return (
               <motion.div key={achievement.id} variants={itemVariants}>
@@ -147,16 +165,11 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg overflow-hidden h-10 w-10 flex items-center justify-center relative">
-                          {orgLogo ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img
-                              src={orgLogo}
-                              alt={achievement.organization}
-                              className="w-full h-full object-contain"
-                            />
-                          ) : (
-                            <Icon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
-                          )}
+                          <AchievementLogo
+                            orgLogo={orgLogo}
+                            organization={achievement.organization}
+                            Icon={Icon}
+                          />
                         </div>
                         <Badge variant="primary" className="ml-2">
                           {categoryLabels[achievement.category]}
