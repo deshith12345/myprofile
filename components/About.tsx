@@ -47,6 +47,7 @@ function SkillCard({ skill }: { skill: Skill }) {
     >
       <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 p-2">
         {isBrand ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={brandIconUrl!}
             alt={skill.name}

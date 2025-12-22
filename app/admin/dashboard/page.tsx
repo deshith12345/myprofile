@@ -113,6 +113,7 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' 
             {displayUrl ? (
                 <>
                     {isImage ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
                         <img
                             src={displayUrl}
                             alt=""
@@ -530,6 +531,7 @@ export default function AdminDashboard() {
                                                 <div className="md:col-span-1 flex items-center gap-4">
                                                     <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden">
                                                         {skill.isBrandIcon && skill.icon ? (
+                                                            /* eslint-disable-next-line @next/next/no-img-element */
                                                             <img
                                                                 src={`https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}`}
                                                                 alt=""

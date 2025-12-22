@@ -43,7 +43,7 @@ export function Hero({ profile }: { profile: typeof ProfileType }) {
     }
 
     return () => clearTimeout(timeout)
-  }, [displayText, isDeleting, currentRoleIndex, roles])
+  }, [displayText, isDeleting, currentRoleIndex, roles, isClient])
 
   const getIcon = (platform: string) => {
     switch (platform.toLowerCase()) {

@@ -42,7 +42,7 @@ export function Projects({ projects: projectsData }: { projects: Project[] }) {
     })
 
     return sorted
-  }, [filter, sort])
+  }, [filter, sort, projectsData])
 
   const handleProjectClick = (project: Project) => {
     setSelectedProject(project)
