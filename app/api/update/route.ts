@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
         const { type, data } = await request.json()
 
-        const validTypes = ['profile', 'skills', 'projects', 'achievements']
+        const validTypes = ['profile', 'skills', 'projects', 'achievements', 'badges']
         if (!validTypes.includes(type)) {
             return NextResponse.json({ success: false, message: 'Invalid data type' }, { status: 400 })
         }

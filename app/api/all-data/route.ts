@@ -30,6 +30,7 @@ export async function GET() {
                 projects: dataMap.projects || defaultProjects,
                 skills: dataMap.skills || defaultSkills,
                 achievements: dataMap.achievements || defaultAchievements,
+                badges: dataMap.badges || [], // No default badges needed if empty
             }
         })
     } catch (error) {
