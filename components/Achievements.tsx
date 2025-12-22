@@ -57,36 +57,38 @@ const organizationLogos: Record<string, string> = {
 }
 
 function AchievementLogo({ achievement, Icon }: { achievement: Achievement, Icon: LucideIcon }) {
-  const [error, setError] = useState(false)
+  const [simpleIconError, setSimpleIconError] = useState(false)
+  const [hardcodedLogoError, setHardcodedLogoError] = useState(false)
+
+  const orgLogo = organizationLogos[achievement.organization]
 
   // 1. Try the dynamically stored orgIconSlug first
-  if (achievement.orgIconSlug && !error) {
+  if (achievement.orgIconSlug && !simpleIconError) {
     return (
       /* eslint-disable-next-line @next/next/no-img-element */
       <img
         src={`https://cdn.simpleicons.org/${achievement.orgIconSlug}/${achievement.orgIconColor || '666666'}`}
         alt={achievement.organization}
         className="w-full h-full object-contain"
-        onError={() => setError(true)}
+        onError={() => setSimpleIconError(true)}
       />
     )
   }
 
   // 2. Fallback to hardcoded organizationLogos map
-  const orgLogo = organizationLogos[achievement.organization]
-  if (orgLogo && !error) {
+  if (orgLogo && !hardcodedLogoError) {
     return (
       /* eslint-disable-next-line @next/next/no-img-element */
       <img
         src={orgLogo}
         alt={achievement.organization}
         className="w-full h-full object-contain"
-        onError={() => setError(true)}
+        onError={() => setHardcodedLogoError(true)}
       />
     )
   }
 
-  // 3. Fallback to category icon
+  // 3. Fallback to category icon (always works)
   return <Icon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
 }
 
@@ -200,10 +202,10 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
         </motion.div>
 
         <motion.div
+          key={activeCategory}
           variants={containerVariants}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {filteredAchievements.map((achievement) => {

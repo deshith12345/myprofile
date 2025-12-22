@@ -877,20 +877,19 @@ export default function AdminDashboard() {
                                                         <div className="space-y-1">
                                                             <label className="text-[8px] font-black uppercase text-gray-500">Issuing Organization</label>
                                                             <div className="flex items-center gap-3">
-                                                                <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden shrink-0">
-                                                                    {achievement.orgIconSlug ? (
+                                                                <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden shrink-0 relative">
+                                                                    {achievement.orgIconSlug && (
                                                                         /* eslint-disable-next-line @next/next/no-img-element */
                                                                         <img
                                                                             src={`https://cdn.simpleicons.org/${achievement.orgIconSlug}/${achievement.orgIconColor || '666666'}`}
                                                                             alt=""
-                                                                            className="w-full h-full object-contain"
+                                                                            className="w-full h-full object-contain absolute inset-0 p-2"
                                                                             onError={(e) => {
                                                                                 e.currentTarget.style.display = 'none';
                                                                             }}
                                                                         />
-                                                                    ) : (
-                                                                        <Award className="w-5 h-5 text-gray-400" />
                                                                     )}
+                                                                    <Award className="w-5 h-5 text-gray-400" />
                                                                 </div>
                                                                 <input
                                                                     value={achievement.organization}
