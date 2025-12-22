@@ -174,9 +174,6 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
             const isActive = activeCategory === tab.id
             const TabIcon = tab.icon
 
-            // Skip tabs with no items (except 'all')
-            if (count === 0 && tab.id !== 'all') return null
-
             return (
               <button
                 key={tab.id}
