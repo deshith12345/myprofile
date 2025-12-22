@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   Shield,
@@ -34,17 +34,34 @@ const iconMap: { [key: string]: any } = {
 }
 
 function SkillCard({ skill }: { skill: Skill }) {
-  const [imgError, setImgError] = useState(false)
-
-  const [prevUrl, setPrevUrl] = useState<string | null>(null)
+  const [imageStatus, setImageStatus] = useState<'loading' | 'loaded' | 'error'>('loading')
+  const [currentUrl, setCurrentUrl] = useState<string | null>(null)
 
   const isBrand = skill.isBrandIcon && skill.icon
   const brandIconUrl = isBrand ? `https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}` : null
 
-  if (brandIconUrl !== prevUrl) {
-    setPrevUrl(brandIconUrl)
-    setImgError(false)
-  }
+  useEffect(() => {
+    if (!brandIconUrl) {
+      setImageStatus('error')
+      return;
+    }
+
+    if (brandIconUrl === currentUrl && imageStatus === 'loaded') return;
+
+    setCurrentUrl(brandIconUrl)
+    // Start as loading unless we are just re-verifying
+    if (brandIconUrl !== currentUrl) setImageStatus('loading')
+
+    const img = new Image()
+    img.src = brandIconUrl
+    img.onload = () => setImageStatus('loaded')
+    img.onerror = () => setImageStatus('error')
+
+    return () => {
+      img.onload = null
+      img.onerror = null
+    }
+  }, [brandIconUrl, currentUrl, imageStatus])
 
   const FallbackIcon = skill.icon && iconMap[skill.icon] ? iconMap[skill.icon] : Shield
 
@@ -57,16 +74,15 @@ function SkillCard({ skill }: { skill: Skill }) {
       className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:border-primary-500/30 transition-all duration-300"
     >
       <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800 p-2">
-        {brandIconUrl && !imgError ? (
+        {imageStatus === 'loaded' && brandIconUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={brandIconUrl}
             alt={skill.name}
             className="w-full h-full object-contain"
-            onError={() => setImgError(true)}
           />
         ) : (
-          <FallbackIcon className="w-full h-full text-primary-500" />
+          <FallbackIcon className={`w-full h-full text-primary-500 ${imageStatus === 'loading' && brandIconUrl ? 'opacity-50 animate-pulse' : ''}`} />
         )}
       </div>
       <div className="flex-1">
