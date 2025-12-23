@@ -98,11 +98,16 @@ function AchievementLogo({ achievement, Icon }: { achievement: Achievement, Icon
 
 export function Achievements({ achievements }: { achievements: Achievement[] }) {
   const [selectedCertificate, setSelectedCertificate] = useState<Achievement | null>(null)
+  const [selectedReport, setSelectedReport] = useState<Achievement | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [activeCategory, setActiveCategory] = useState<AchievementCategory | 'all'>('all')
 
   const handleCertificateClick = (achievement: Achievement) => {
-    if (achievement.certificateFile) {
+    if (achievement.category === 'reports' && achievement.content) {
+      setSelectedReport(achievement)
+      setIsReportModalOpen(true)
+    } else if (achievement.certificateFile) {
       setSelectedCertificate(achievement)
       setIsModalOpen(true)
     }
@@ -293,14 +298,25 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
                     </p>
 
                     <div className="flex items-center gap-3 mt-auto">
-                      {achievement.certificateFile && (
+                      {achievement.category === 'reports' ? (
                         <button
                           onClick={() => handleCertificateClick(achievement)}
-                          className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
+                          className="px-4 py-2 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-sm font-bold hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors flex items-center gap-2"
                         >
-                          View Certificate
+                          <BookOpen className="w-4 h-4" />
+                          Read Full Report
                         </button>
+                      ) : (
+                        achievement.certificateFile && (
+                          <button
+                            onClick={() => handleCertificateClick(achievement)}
+                            className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
+                          >
+                            View Certificate
+                          </button>
+                        )
                       )}
+
                       {achievement.verificationUrl && (
                         <a
                           href={achievement.verificationUrl}
@@ -320,13 +336,100 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
           })}
         </motion.div>
 
-        {/* Certificate Modal */}
-        <CertificateModal
-          achievement={selectedCertificate}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      </div>
-    </section>
+        {/* ... (existing code) */}
+      </motion.div>
+
+      {/* Certificate Modal */}
+      <CertificateModal
+        achievement={selectedCertificate}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* Report Viewer Modal */}
+      <ReportViewerModal
+        achievement={selectedReport}
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+      />
+    </div>
+    </section >
   )
 }
+
+function ReportViewerModal({ achievement, isOpen, onClose }: { achievement: Achievement | null, isOpen: boolean, onClose: () => void }) {
+  if (!achievement || !isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        className="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+      >
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 z-10">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+              <BookOpen className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-1">{achievement.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{achievement.organization} • {formatDate(achievement.date)}</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+          >
+            <ExternalLink className="w-5 h-5 text-gray-500" /> {/* Using ExternalLink as close icon proxy or just X if imported */}
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 md:p-10">
+          {achievement.coverImage && (
+            <div className="w-full h-64 md:h-80 relative rounded-xl overflow-hidden mb-8">
+              <Image
+                src={achievement.coverImage}
+                alt={achievement.title}
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                <h1 className="text-3xl md:text-4xl font-bold text-white shadow-sm">{achievement.title}</h1>
+              </div>
+            </div>
+          )}
+
+          <div className="prose dark:prose-invert max-w-none">
+            {achievement.content ? (
+              <div className="whitespace-pre-wrap font-serif text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+                {achievement.content}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+                <FileText className="w-16 h-16 mb-4 opacity-20" />
+                <p>No text content available for this report.</p>
+                {achievement.certificateFile && (
+                  <a
+                    href={achievement.certificateFile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+                  >
+                    Download Original PDF
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+

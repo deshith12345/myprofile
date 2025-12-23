@@ -5,10 +5,11 @@ import { motion } from 'framer-motion'
 import { ProjectCard } from './ProjectCard'
 import { ProjectModal } from './ProjectModal'
 import { Badge } from '@/components/ui/Badge'
+import { LayoutGrid, Globe, Smartphone, Code, Archive } from 'lucide-react'
+import { Project } from '@/data/types'
 
 type Filter = 'all' | 'web' | 'mobile' | 'opensource' | 'other'
 type Sort = 'latest' | 'popular' | 'featured'
-import { Project } from '@/data/types'
 
 export function Projects({ projects: projectsData }: { projects: Project[] }) {
   const [filter, setFilter] = useState<Filter>('all')
@@ -49,12 +50,18 @@ export function Projects({ projects: projectsData }: { projects: Project[] }) {
     setIsModalOpen(true)
   }
 
-  const filters: { label: string; value: Filter }[] = [
-    { label: 'All', value: 'all' },
-    { label: 'Web Apps', value: 'web' },
-    { label: 'Mobile', value: 'mobile' },
-    { label: 'Open Source', value: 'opensource' },
-    { label: 'Other', value: 'other' },
+  // Get count for each category
+  const getCategoryCount = (category: Filter) => {
+    if (category === 'all') return projectsData.length
+    return projectsData.filter(p => p.category === category).length
+  }
+
+  const filters: { label: string; value: Filter; icon: any }[] = [
+    { label: 'All', value: 'all', icon: LayoutGrid },
+    { label: 'Web Apps', value: 'web', icon: Globe },
+    { label: 'Mobile', value: 'mobile', icon: Smartphone },
+    { label: 'Open Source', value: 'opensource', icon: Code },
+    { label: 'Other', value: 'other', icon: Archive },
   ]
 
   const sorts: { label: string; value: Sort }[] = [
@@ -89,21 +96,40 @@ export function Projects({ projects: projectsData }: { projects: Project[] }) {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-4 mb-12"
         >
-          {/* Filters - horizontally scrollable on mobile */}
+          {/* Filters - styled like Achievements */}
           <div className="w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
             <div className="flex gap-2 sm:flex-wrap sm:justify-center min-w-max sm:min-w-0">
-              {filters.map((filterOption) => (
-                <button
-                  key={filterOption.value}
-                  onClick={() => setFilter(filterOption.value)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${filter === filterOption.value
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                    }`}
-                >
-                  {filterOption.label}
-                </button>
-              ))}
+              {filters.map((filterOption) => {
+                const count = getCategoryCount(filterOption.value)
+                const isActive = filter === filterOption.value
+                const Icon = filterOption.icon
+
+                return (
+                  <button
+                    key={filterOption.value}
+                    onClick={() => setFilter(filterOption.value)}
+                    className={`
+                      group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                      ${isActive
+                        ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25'
+                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 border border-gray-200 dark:border-gray-700'
+                      }
+                    `}
+                  >
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-primary-500'}`} />
+                    <span>{filterOption.label}</span>
+                    <span className={`
+                      px-2 py-0.5 rounded-full text-xs font-bold
+                      ${isActive
+                        ? 'bg-white/20 text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                      }
+                    `}>
+                      {count}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
@@ -160,4 +186,3 @@ export function Projects({ projects: projectsData }: { projects: Project[] }) {
     </section>
   )
 }
-

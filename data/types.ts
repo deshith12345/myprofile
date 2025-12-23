@@ -29,9 +29,9 @@ export interface Achievement {
   verificationUrl?: string;
   certificateFile?: string;
   coverImage?: string; // Magazine-style cover image for reports
-  category: AchievementCategory;
-  orgIconSlug?: string;
-  orgIconColor?: string;
+  content?: string; // Extracted text content from reports
+  location?: string;
+  blogImage?: string; // Specific image for the blog view
 }
 
 export type AchievementCategory = 'award' | 'certification' | 'reports' | 'speaking' | 'event' | 'article';

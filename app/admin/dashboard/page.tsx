@@ -37,13 +37,15 @@ import { findBrandIcon, findOrganizationIcon } from '@/lib/icon-utils'
 
 type Tab = 'profile' | 'skills' | 'projects' | 'achievements' | 'badges'
 
-function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*' }: { onUpload: (url: string) => void, currentFile?: string, aspect?: 'video' | 'square', accept?: string }) {
+function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*', onFileSelect }: { onUpload: (url: string) => void, currentFile?: string, aspect?: 'video' | 'square', accept?: string, onFileSelect?: (file: File) => void }) {
     const [isDragging, setIsDragging] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const handleFile = async (file: File) => {
+        if (onFileSelect) onFileSelect(file)
+
         // Create immediate local preview
         if (file.type.startsWith('image/')) {
             const localUrl = URL.createObjectURL(file)
@@ -164,6 +166,9 @@ export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState<Tab>('profile')
     const [isSaving, setIsSaving] = useState(false)
     const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string, url?: string | null } | null>(null)
+
+    // Achievement category sub-tab state
+    const [achievementCategory, setAchievementCategory] = useState<AchievementCategory | 'all'>('all')
 
     const [isLoadingData, setIsLoadingData] = useState(true)
     const [localProfile, setLocalProfile] = useState<Profile>(profile as Profile)
@@ -832,7 +837,9 @@ export default function AdminDashboard() {
 
                                             <div className="grid md:grid-cols-12 gap-8">
                                                 <div className="md:col-span-4 space-y-4">
-                                                    <label className="text-[8px] font-black uppercase text-gray-500 block">Credential File (PDF/IMG/DOCX/PPTX)</label>
+                                                    <label className="text-[8px] font-black uppercase text-gray-500 block">
+                                                        {achievement.category === 'reports' ? 'Report Document (Auto-Extract)' : 'Credential File (PDF/IMG/DOCX)'}
+                                                    </label>
                                                     <DropZone
                                                         currentFile={achievement.certificateFile}
                                                         accept="image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation"
@@ -840,6 +847,23 @@ export default function AdminDashboard() {
                                                             const updated = [...localAchievements]
                                                             updated[idx].certificateFile = url
                                                             setLocalAchievements(updated)
+                                                        }}
+                                                        onFileSelect={async (file) => {
+                                                            if (achievement.category === 'reports') {
+                                                                const formData = new FormData()
+                                                                formData.append('file', file)
+                                                                try {
+                                                                    const res = await fetch('/api/extract-content', { method: 'POST', body: formData })
+                                                                    const data = await res.json()
+                                                                    if (data.success) {
+                                                                        const updated = [...localAchievements]
+                                                                        updated[idx].content = data.text
+                                                                        setLocalAchievements(updated)
+                                                                    }
+                                                                } catch (e) {
+                                                                    console.error('Extraction failed', e)
+                                                                }
+                                                            }
                                                         }}
                                                     />
                                                     {achievement.category === 'reports' && (
@@ -878,8 +902,9 @@ export default function AdminDashboard() {
 
                                                 <div className="md:col-span-8 space-y-6">
                                                     <div className="grid md:grid-cols-2 gap-8">
+                                                        {/* ... (existing Title and Org fields) */}
                                                         <div className="space-y-1">
-                                                            <label className="text-[8px] font-black uppercase text-gray-500">Certification Descriptor</label>
+                                                            <label className="text-[8px] font-black uppercase text-gray-500">Title / Descriptor</label>
                                                             <input
                                                                 value={achievement.title}
                                                                 onChange={(e) => {
@@ -891,7 +916,7 @@ export default function AdminDashboard() {
                                                             />
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <label className="text-[8px] font-black uppercase text-gray-500">Issuing Organization</label>
+                                                            <label className="text-[8px] font-black uppercase text-gray-500">Organization / Host</label>
                                                             <div className="flex items-center gap-3">
                                                                 <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden shrink-0 relative">
                                                                     {achievement.orgIconSlug && (
@@ -910,7 +935,6 @@ export default function AdminDashboard() {
                                                                 <input
                                                                     value={achievement.organization}
                                                                     onBlur={() => {
-                                                                        // Auto-detect organization icon
                                                                         const iconData = findOrganizationIcon(achievement.organization);
                                                                         const updated = [...localAchievements];
                                                                         updated[idx].orgIconSlug = iconData.slug;
@@ -944,7 +968,7 @@ export default function AdminDashboard() {
 
                                                     <div className="grid md:grid-cols-2 gap-8">
                                                         <div className="space-y-1">
-                                                            <label className="text-[8px] font-black uppercase text-gray-500">Enforcement Date</label>
+                                                            <label className="text-[8px] font-black uppercase text-gray-500">Date</label>
                                                             <input
                                                                 value={achievement.date}
                                                                 onChange={(e) => {
@@ -956,7 +980,7 @@ export default function AdminDashboard() {
                                                             />
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <label className="text-[8px] font-black uppercase text-gray-500">Classification</label>
+                                                            <label className="text-[8px] font-black uppercase text-gray-500">Category</label>
                                                             <select
                                                                 value={achievement.category}
                                                                 onChange={(e) => {
@@ -976,8 +1000,26 @@ export default function AdminDashboard() {
                                                         </div>
                                                     </div>
 
+                                                    {(achievement.category === 'event' || achievement.category === 'speaking') && (
+                                                        <div className="space-y-1">
+                                                            <label className="text-[8px] font-black uppercase text-gray-500">Location / Venue</label>
+                                                            <input
+                                                                value={achievement.location || ''}
+                                                                onChange={(e) => {
+                                                                    const updated = [...localAchievements]
+                                                                    updated[idx].location = e.target.value
+                                                                    setLocalAchievements(updated)
+                                                                }}
+                                                                placeholder="e.g. Las Vegas, NV"
+                                                                className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-medium text-gray-500 outline-none focus:border-primary-500 transition-all"
+                                                            />
+                                                        </div>
+                                                    )}
+
                                                     <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase text-gray-500">Mission Breakdown</label>
+                                                        <label className="text-[8px] font-black uppercase text-gray-500">
+                                                            {achievement.category === 'reports' ? 'Executive Summary' : 'Description'}
+                                                        </label>
                                                         <textarea
                                                             rows={3}
                                                             value={achievement.description}
@@ -989,6 +1031,28 @@ export default function AdminDashboard() {
                                                             className="w-full bg-transparent border border-gray-200 dark:border-gray-700 p-3 rounded-xl text-xs text-gray-500 outline-none focus:border-primary-500 transition-all resize-none"
                                                         />
                                                     </div>
+
+                                                    {achievement.category === 'reports' && (
+                                                        <div className="space-y-1">
+                                                            <div className="flex justify-between items-center">
+                                                                <label className="text-[8px] font-black uppercase text-gray-500">Report Content (Extracted)</label>
+                                                                <span className="text-[8px] text-primary-500 cursor-pointer hover:underline" onClick={() => {
+                                                                    // Optional: Manual re-trigger or upload trigger could go here
+                                                                }}>Auto-extracted from document</span>
+                                                            </div>
+                                                            <textarea
+                                                                rows={10}
+                                                                value={achievement.content || ''}
+                                                                onChange={(e) => {
+                                                                    const updated = [...localAchievements]
+                                                                    updated[idx].content = e.target.value
+                                                                    setLocalAchievements(updated)
+                                                                }}
+                                                                className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl text-xs font-mono text-gray-600 dark:text-gray-300 outline-none focus:border-primary-500 transition-all resize-y"
+                                                                placeholder="Content will appear here after document upload..."
+                                                            />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </Card>
