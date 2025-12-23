@@ -57,8 +57,8 @@ export async function POST(request: Request) {
         const bucket = new GridFSBucket(db, { bucketName: 'images' })
 
         const uploadStream = bucket.openUploadStream(fileName, {
-            contentType: file.type,
             metadata: {
+                contentType: file.type,
                 originalName: file.name,
                 uploadDate: new Date()
             }

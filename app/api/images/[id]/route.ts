@@ -31,7 +31,7 @@ export async function GET(
 
             return new NextResponse(readable as any, {
                 headers: {
-                    'Content-Type': (file as any).contentType || 'application/octet-stream',
+                    'Content-Type': (file as any).metadata?.contentType || (file as any).contentType || 'application/octet-stream',
                     'Cache-Control': 'public, max-age=31536000, immutable',
                 },
             })
