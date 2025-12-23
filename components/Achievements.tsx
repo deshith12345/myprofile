@@ -287,9 +287,11 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
                     </div>
 
                     <h3 className="text-xl font-bold mb-2">{achievement.title}</h3>
-                    <p className="text-primary-600 dark:text-primary-400 font-medium mb-2">
-                      {achievement.organization}
-                    </p>
+                    {achievement.organization && (
+                      <p className="text-primary-600 dark:text-primary-400 font-medium mb-2">
+                        {achievement.organization}
+                      </p>
+                    )}
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                       {formatDate(achievement.date)}
                     </p>
