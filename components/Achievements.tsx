@@ -14,7 +14,7 @@ import { LucideIcon } from 'lucide-react'
 const categoryIcons: Record<AchievementCategory, LucideIcon> = {
   award: Trophy,
   certification: Award,
-  publication: BookOpen,
+  reports: BookOpen,
   speaking: Mic,
   event: Calendar,
   article: Newspaper,
@@ -23,7 +23,7 @@ const categoryIcons: Record<AchievementCategory, LucideIcon> = {
 const categoryLabels: Record<AchievementCategory, string> = {
   award: 'Award',
   certification: 'Certification',
-  publication: 'Publication',
+  reports: 'Report',
   speaking: 'Speaking',
   event: 'Event',
   article: 'Article',
@@ -35,7 +35,7 @@ const filterTabs: { id: AchievementCategory | 'all'; label: string; icon: Lucide
   { id: 'award', label: 'Awards', icon: Trophy },
   { id: 'event', label: 'Events', icon: Calendar },
   { id: 'article', label: 'Articles', icon: Newspaper },
-  { id: 'publication', label: 'Publications', icon: BookOpen },
+  { id: 'reports', label: 'Reports', icon: BookOpen },
   { id: 'speaking', label: 'Speaking', icon: Mic },
 ]
 
@@ -157,7 +157,7 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
             Achievements & <span className="gradient-text">Recognition</span>
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Certifications, awards, publications, and speaking engagements
+            Certifications, awards, reports, and speaking engagements
           </p>
         </motion.div>
 
@@ -217,16 +217,24 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
             return (
               <motion.div key={achievement.id} variants={itemVariants}>
                 <Card hover className="h-full flex flex-col">
-                  {/* Certificate Image */}
-                  {achievement.certificateFile && (
+                  {/* Cover Image (for reports) or Certificate Image */}
+                  {(achievement.coverImage || achievement.certificateFile) && (
                     <div
-                      className={`relative w-full h-48 rounded-t-xl overflow-hidden mb-4 ${achievement.certificateFile ? 'cursor-pointer' : ''
-                        }`}
-                      onClick={() => handleCertificateClick(achievement)}
+                      className={`relative w-full h-48 rounded-t-xl overflow-hidden mb-4 ${achievement.certificateFile ? 'cursor-pointer' : ''}
+                        ${achievement.category === 'reports' && achievement.coverImage ? 'h-64' : ''}`}
+                      onClick={() => achievement.certificateFile && handleCertificateClick(achievement)}
                     >
-                      {isImage ? (
+                      {achievement.coverImage ? (
                         <Image
-                          src={achievement.certificateFile}
+                          src={achievement.coverImage}
+                          alt={achievement.title}
+                          fill
+                          className="object-cover transition-transform duration-300 hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      ) : isImage ? (
+                        <Image
+                          src={achievement.certificateFile!}
                           alt={achievement.title}
                           fill
                           className="object-cover transition-transform duration-300 hover:scale-110"
@@ -245,7 +253,16 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
                           </div>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                      {achievement.category === 'reports' && achievement.coverImage && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent">
+                          <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 className="text-white font-bold text-lg drop-shadow-lg">{achievement.title}</h3>
+                          </div>
+                        </div>
+                      )}
+                      {!achievement.coverImage && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                      )}
                     </div>
                   )}
 

@@ -843,6 +843,20 @@ export default function AdminDashboard() {
                                                         }}
                                                     />
                                                     <div className="space-y-1">
+                                                        <label className="text-[8px] font-black uppercase text-gray-500">Cover Image (For Reports)</label>
+                                                        <DropZone
+                                                            currentFile={achievement.coverImage}
+                                                            accept="image/*"
+                                                            aspect="video"
+                                                            onUpload={(url) => {
+                                                                const updated = [...localAchievements]
+                                                                updated[idx].coverImage = url
+                                                                setLocalAchievements(updated)
+                                                            }}
+                                                        />
+                                                        <p className="text-[9px] text-gray-400 font-medium">Magazine-style cover for Reports category</p>
+                                                    </div>
+                                                    <div className="space-y-1">
                                                         <label className="text-[8px] font-black uppercase text-gray-500">Verification URL</label>
                                                         <div className="relative">
                                                             <LinkIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400" />
@@ -954,7 +968,7 @@ export default function AdminDashboard() {
                                                                 <option value="award">Award</option>
                                                                 <option value="event">Event</option>
                                                                 <option value="article">Article</option>
-                                                                <option value="publication">Publication</option>
+                                                                <option value="reports">Report</option>
                                                                 <option value="speaking">Speaking</option>
                                                             </select>
                                                         </div>

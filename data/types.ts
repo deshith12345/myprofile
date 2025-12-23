@@ -28,12 +28,13 @@ export interface Achievement {
   icon: string;
   verificationUrl?: string;
   certificateFile?: string;
+  coverImage?: string; // Magazine-style cover image for reports
   category: AchievementCategory;
   orgIconSlug?: string;
   orgIconColor?: string;
 }
 
-export type AchievementCategory = 'award' | 'certification' | 'publication' | 'speaking' | 'event' | 'article';
+export type AchievementCategory = 'award' | 'certification' | 'reports' | 'speaking' | 'event' | 'article';
 
 export interface Skill {
   name: string;
