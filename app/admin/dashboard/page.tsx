@@ -832,30 +832,32 @@ export default function AdminDashboard() {
 
                                             <div className="grid md:grid-cols-12 gap-8">
                                                 <div className="md:col-span-4 space-y-4">
-                                                    <label className="text-[8px] font-black uppercase text-gray-500 block">Credential File (PDF/IMG)</label>
+                                                    <label className="text-[8px] font-black uppercase text-gray-500 block">Credential File (PDF/IMG/DOCX/PPTX)</label>
                                                     <DropZone
                                                         currentFile={achievement.certificateFile}
-                                                        accept="image/*,application/pdf"
+                                                        accept="image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation"
                                                         onUpload={(url) => {
                                                             const updated = [...localAchievements]
                                                             updated[idx].certificateFile = url
                                                             setLocalAchievements(updated)
                                                         }}
                                                     />
-                                                    <div className="space-y-1">
-                                                        <label className="text-[8px] font-black uppercase text-gray-500">Cover Image (For Reports)</label>
-                                                        <DropZone
-                                                            currentFile={achievement.coverImage}
-                                                            accept="image/*"
-                                                            aspect="video"
-                                                            onUpload={(url) => {
-                                                                const updated = [...localAchievements]
-                                                                updated[idx].coverImage = url
-                                                                setLocalAchievements(updated)
-                                                            }}
-                                                        />
-                                                        <p className="text-[9px] text-gray-400 font-medium">Magazine-style cover for Reports category</p>
-                                                    </div>
+                                                    {achievement.category === 'reports' && (
+                                                        <div className="space-y-1">
+                                                            <label className="text-[8px] font-black uppercase text-gray-500">Cover Image (For Reports)</label>
+                                                            <DropZone
+                                                                currentFile={achievement.coverImage}
+                                                                accept="image/*"
+                                                                aspect="video"
+                                                                onUpload={(url) => {
+                                                                    const updated = [...localAchievements]
+                                                                    updated[idx].coverImage = url
+                                                                    setLocalAchievements(updated)
+                                                                }}
+                                                            />
+                                                            <p className="text-[9px] text-gray-400 font-medium">Magazine-style cover for Reports category</p>
+                                                        </div>
+                                                    )}
                                                     <div className="space-y-1">
                                                         <label className="text-[8px] font-black uppercase text-gray-500">Verification URL</label>
                                                         <div className="relative">

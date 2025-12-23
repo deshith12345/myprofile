@@ -18,14 +18,31 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, message: 'No file uploaded' }, { status: 400 })
         }
 
-        // Basic validation
-        if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
-            return NextResponse.json({ success: false, message: 'Invalid file type. Only images and PDFs are allowed.' }, { status: 400 })
+        // Extended validation for documents
+        const allowedTypes = [
+            'image/',
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+            'application/msword', // .doc
+            'application/vnd.ms-powerpoint' // .ppt
+        ]
+
+        const isValidType = allowedTypes.some(type => file.type.startsWith(type) || file.type === type)
+
+        if (!isValidType) {
+            return NextResponse.json({
+                success: false,
+                message: 'Invalid file type. Allowed: images, PDF, DOCX, PPTX'
+            }, { status: 400 })
         }
 
-        // Limit size to 5MB
-        if (file.size > 5 * 1024 * 1024) {
-            return NextResponse.json({ success: false, message: 'File too large. Max 5MB.' }, { status: 400 })
+        // Increase limit to 20MB for reports/documents
+        if (file.size > 20 * 1024 * 1024) {
+            return NextResponse.json({
+                success: false,
+                message: 'File too large. Max 20MB.'
+            }, { status: 400 })
         }
 
         const bytes = await file.arrayBuffer()
