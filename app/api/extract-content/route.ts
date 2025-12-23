@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
-import pdf from 'pdf-parse'
+const pdf = require('pdf-parse')
 import mammoth from 'mammoth'
 
 export async function POST(request: Request) {

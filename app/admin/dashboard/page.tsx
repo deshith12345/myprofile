@@ -31,7 +31,7 @@ import { skills as skillsData } from '@/data/skills'
 import { projects as projectsData } from '@/data/projects'
 import { achievements as achievementsData } from '@/data/achievements'
 import { badges as badgesData } from '@/data/badges'
-import { Skill, Project, Achievement, Profile, Badge } from '@/data/types'
+import { Skill, Project, Achievement, Profile, Badge, AchievementCategory } from '@/data/types'
 import { findBrandIcon, findOrganizationIcon } from '@/lib/icon-utils'
 
 
