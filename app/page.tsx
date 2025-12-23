@@ -51,19 +51,11 @@ async function getData() {
 export default async function Home() {
   const { profile, projects, skills, achievements, badges } = await getData()
 
-  // Calculate latest update
-  const allUpdates = [
-    ...projects.map(p => ({ title: p.title, date: p.date, type: 'project' as const })),
-    ...achievements.map(a => ({ title: a.title, date: a.date, type: 'achievement' as const }))
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
-  const latestUpdate = allUpdates.length > 0 ? allUpdates[0] : undefined
-
   return (
     <main className="min-h-screen">
       <StructuredData profile={profile} />
       <Header profile={profile} />
-      <Hero profile={profile} latestUpdate={latestUpdate} />
+      <Hero profile={profile} />
       <About skills={skills} />
       <Projects projects={projects} />
       <Achievements achievements={achievements} />

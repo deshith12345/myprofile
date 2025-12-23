@@ -129,23 +129,6 @@ export function Hero({ profile, latestUpdate }: {
         >
           {/* Text Content */}
           <motion.div variants={itemVariants} className="text-center lg:text-left">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.2 }}
-              className="inline-block mb-4"
-            >
-              {latestUpdate ? (
-                <span onClick={() => scrollToElement(latestUpdate.type === 'project' ? 'projects' : 'achievements')} className="group flex items-center gap-2 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 px-4 py-1.5 rounded-full text-sm font-bold cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors">
-                  <span className="w-2 h-2 rounded-full bg-primary-600 animate-pulse"></span>
-                  New {latestUpdate.type === 'project' ? 'Operation' : 'Achievement'}: {latestUpdate.title}
-                </span>
-              ) : (
-                <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 px-4 py-1 rounded-full text-sm font-medium">
-                  Welcome to my portfolio
-                </span>
-              )}
-            </motion.div>
 
             <motion.h1
               variants={itemVariants}
