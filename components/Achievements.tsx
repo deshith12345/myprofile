@@ -336,23 +336,23 @@ export function Achievements({ achievements }: { achievements: Achievement[] }) 
           })}
         </motion.div>
 
-        {/* ... (existing code) */}
-      </motion.div>
 
-      {/* Certificate Modal */}
-      <CertificateModal
-        achievement={selectedCertificate}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
 
-      {/* Report Viewer Modal */}
-      <ReportViewerModal
-        achievement={selectedReport}
-        isOpen={isReportModalOpen}
-        onClose={() => setIsReportModalOpen(false)}
-      />
-    </div>
+
+        {/* Certificate Modal */}
+        <CertificateModal
+          achievement={selectedCertificate}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+
+        {/* Report Viewer Modal */}
+        <ReportViewerModal
+          achievement={selectedReport}
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+        />
+      </div>
     </section >
   )
 }
