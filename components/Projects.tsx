@@ -13,7 +13,6 @@ type Sort = 'latest' | 'popular' | 'featured'
 
 export function Projects({ projects: projectsData }: { projects: Project[] }) {
   const [filter, setFilter] = useState<Filter>('all')
-  const [sort, setSort] = useState<Sort>('latest')
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -25,25 +24,9 @@ export function Projects({ projects: projectsData }: { projects: Project[] }) {
       filtered = filtered.filter((project) => project.category === filter)
     }
 
-    // Apply sort
-    const sorted = [...filtered].sort((a, b) => {
-      switch (sort) {
-        case 'latest':
-          return new Date(b.date).getTime() - new Date(a.date).getTime()
-        case 'featured':
-          if (a.featured && !b.featured) return -1
-          if (!a.featured && b.featured) return 1
-          return new Date(b.date).getTime() - new Date(a.date).getTime()
-        case 'popular':
-          // You can add view counts or other metrics here
-          return 0
-        default:
-          return 0
-      }
-    })
-
-    return sorted
-  }, [filter, sort, projectsData])
+    // Default sort by latest
+    return filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  }, [filter, projectsData])
 
   const handleProjectClick = (project: Project) => {
     setSelectedProject(project)
@@ -62,12 +45,6 @@ export function Projects({ projects: projectsData }: { projects: Project[] }) {
     { label: 'Mobile', value: 'mobile', icon: Smartphone },
     { label: 'Open Source', value: 'opensource', icon: Code },
     { label: 'Other', value: 'other', icon: Archive },
-  ]
-
-  const sorts: { label: string; value: Sort }[] = [
-    { label: 'Latest', value: 'latest' },
-    { label: 'Featured', value: 'featured' },
-    { label: 'Popular', value: 'popular' },
   ]
 
   return (
@@ -94,7 +71,7 @@ export function Projects({ projects: projectsData }: { projects: Project[] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-4 mb-12"
+          className="flex justify-center mb-12"
         >
           {/* Filters - styled like Achievements */}
           <div className="w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
@@ -131,22 +108,6 @@ export function Projects({ projects: projectsData }: { projects: Project[] }) {
                 )
               })}
             </div>
-          </div>
-
-          {/* Sort */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as Sort)}
-              className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-none focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              {sorts.map((sortOption) => (
-                <option key={sortOption.value} value={sortOption.value}>
-                  {sortOption.label}
-                </option>
-              ))}
-            </select>
           </div>
         </motion.div>
 

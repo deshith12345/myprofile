@@ -37,11 +37,10 @@ export async function POST(request: Request) {
             }, { status: 400 })
         }
 
-        // Increase limit to 20MB for reports/documents
-        if (file.size > 20 * 1024 * 1024) {
+        if (file.size > 25 * 1024 * 1024) {
             return NextResponse.json({
                 success: false,
-                message: 'File too large. Max 20MB.'
+                message: 'File too large. Max 25MB.'
             }, { status: 400 })
         }
 
