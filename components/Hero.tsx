@@ -8,7 +8,10 @@ import { Button } from '@/components/ui/Button'
 import { scrollToElement } from '@/lib/utils'
 import { profile as ProfileType } from '@/data/profile'
 
-export function Hero({ profile }: { profile: typeof ProfileType }) {
+export function Hero({ profile, latestUpdate }: {
+  profile: typeof ProfileType,
+  latestUpdate?: { title: string, date: string, type: 'project' | 'achievement' }
+}) {
   const roles = profile.roles || ['Cybersecurity Student', 'Security Analyst', 'Penetration Tester', 'Threat Hunter']
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [displayText, setDisplayText] = useState('')
@@ -132,9 +135,16 @@ export function Hero({ profile }: { profile: typeof ProfileType }) {
               transition={{ type: 'spring', delay: 0.2 }}
               className="inline-block mb-4"
             >
-              <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 px-4 py-1 rounded-full text-sm font-medium">
-                Welcome to my portfolio
-              </span>
+              {latestUpdate ? (
+                <span onClick={() => scrollToElement(latestUpdate.type === 'project' ? 'projects' : 'achievements')} className="group flex items-center gap-2 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 px-4 py-1.5 rounded-full text-sm font-bold cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors">
+                  <span className="w-2 h-2 rounded-full bg-primary-600 animate-pulse"></span>
+                  New {latestUpdate.type === 'project' ? 'Operation' : 'Achievement'}: {latestUpdate.title}
+                </span>
+              ) : (
+                <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 px-4 py-1 rounded-full text-sm font-medium">
+                  Welcome to my portfolio
+                </span>
+              )}
             </motion.div>
 
             <motion.h1
