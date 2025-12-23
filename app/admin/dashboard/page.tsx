@@ -35,7 +35,7 @@ import { Skill, Project, Achievement, Profile, Badge, AchievementCategory } from
 import { findBrandIcon, findOrganizationIcon } from '@/lib/icon-utils'
 
 
-type Tab = 'profile' | 'skills' | 'projects' | 'achievements' | 'badges'
+type Tab = 'profile' | 'skills' | 'projects' | 'badges' | 'award' | 'certification' | 'reports' | 'speaking' | 'event' | 'article'
 
 function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*', onFileSelect }: { onUpload: (url: string) => void, currentFile?: string, aspect?: 'video' | 'square', accept?: string, onFileSelect?: (file: File) => void }) {
     const [isDragging, setIsDragging] = useState(false)
@@ -203,7 +203,12 @@ export default function AdminDashboard() {
         { id: 'profile', label: 'Profile', icon: User },
         { id: 'skills', label: 'Skills', icon: Award },
         { id: 'projects', label: 'Projects', icon: Briefcase },
-        { id: 'achievements', label: 'Achievements', icon: Award },
+        { id: 'certification', label: 'Certifications', icon: Award },
+        { id: 'award', label: 'Awards', icon: Award },
+        { id: 'reports', label: 'Reports', icon: FileText },
+        { id: 'speaking', label: 'Speaking', icon: Award },
+        { id: 'event', label: 'Events', icon: Award },
+        { id: 'article', label: 'Articles', icon: FileText },
         { id: 'badges', label: 'Badges', icon: CheckCircle2 },
     ]
 
@@ -804,47 +809,30 @@ export default function AdminDashboard() {
                             </div>
                         )}
 
-                        {activeTab === 'achievements' && (
+                        {['award', 'certification', 'reports', 'speaking', 'event', 'article'].includes(activeTab) && (
                             <div className="space-y-8">
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border border-gray-200 dark:border-gray-700">
-                                    <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 ml-2">Accomplishments</h4>
-                                    <div className="flex gap-2 flex-wrap">
-                                        <div className="flex bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700 overflow-x-auto max-w-[200px] md:max-w-none">
-                                            {['all', 'award', 'certification', 'reports', 'speaking', 'event', 'article'].map((cat) => (
-                                                <button
-                                                    key={cat}
-                                                    onClick={() => setAchievementCategory(cat as AchievementCategory | 'all')}
-                                                    className={`px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${achievementCategory === cat
-                                                        ? 'bg-primary-600 text-white shadow-sm'
-                                                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                                                        }`}
-                                                >
-                                                    {cat === 'all' ? 'All' : cat}
-                                                </button>
-                                            ))}
-                                        </div>
-                                        <Button size="sm" onClick={() => {
-                                            const newCategory = achievementCategory === 'all' ? 'certification' : achievementCategory
-                                            const id = Math.random().toString(36).substr(2, 9)
-                                            const newAchievement: Achievement = {
-                                                id,
-                                                title: 'New Entry',
-                                                organization: 'Organization',
-                                                date: new Date().toISOString().split('T')[0],
-                                                description: 'Description...',
-                                                icon: 'shield',
-                                                category: newCategory,
-                                            } as Achievement
-                                            setLocalAchievements([newAchievement, ...localAchievements])
-                                        }} className="bg-primary-600 hover:bg-primary-500 text-white rounded-xl whitespace-nowrap">
-                                            <Plus className="w-4 h-4 mr-2" /> Add {achievementCategory === 'all' ? 'Item' : achievementCategory}
-                                        </Button>
-                                    </div>
+                                <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border border-gray-200 dark:border-gray-700">
+                                    <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 ml-2">{activeTab} List</h4>
+                                    <Button size="sm" onClick={() => {
+                                        const id = Math.random().toString(36).substr(2, 9)
+                                        const newAchievement: Achievement = {
+                                            id,
+                                            title: 'New Entry',
+                                            organization: 'Organization',
+                                            date: new Date().toISOString().split('T')[0],
+                                            description: 'Description...',
+                                            icon: 'shield',
+                                            category: activeTab as AchievementCategory,
+                                        } as Achievement
+                                        setLocalAchievements([newAchievement, ...localAchievements])
+                                    }} className="bg-primary-600 hover:bg-primary-500 text-white rounded-xl whitespace-nowrap">
+                                        <Plus className="w-4 h-4 mr-2" /> Add {activeTab}
+                                    </Button>
                                 </div>
 
                                 <div className="grid gap-6">
                                     {localAchievements
-                                        .filter(a => achievementCategory === 'all' || a.category === achievementCategory)
+                                        .filter(a => a.category === activeTab)
                                         .map((achievement, idx) => (
                                             <Card key={achievement.id} className="p-6 bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 rounded-2xl relative group transition-all hover:bg-white dark:hover:bg-gray-800/60">
                                                 <button
