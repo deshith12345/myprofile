@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getDb } from '@/lib/mongodb'
-import { ObjectId } from 'mongodb'
+import { ObjectId, GridFSBucket } from 'mongodb'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -12,7 +12,32 @@ export async function GET(
         const id = params.id
         const db = await getDb()
 
-        // 1. Try to find image in MongoDB
+        // 1. Try to find in GridFS first (New System)
+        const bucket = new GridFSBucket(db, { bucketName: 'images' })
+        const files = await bucket.find({ filename: id }).toArray()
+
+        if (files.length > 0) {
+            const file = files[0]
+            const stream = bucket.openDownloadStreamByName(id)
+
+            // Convert to Web ReadableStream for Next.js
+            const readable = new ReadableStream({
+                start(controller) {
+                    stream.on('data', (chunk) => controller.enqueue(chunk))
+                    stream.on('end', () => controller.close())
+                    stream.on('error', (err) => controller.error(err))
+                }
+            })
+
+            return new NextResponse(readable as any, {
+                headers: {
+                    'Content-Type': file.contentType || 'application/octet-stream',
+                    'Cache-Control': 'public, max-age=31536000, immutable',
+                },
+            })
+        }
+
+        // 2. Legacy Fallback: Try to find image in MongoDB standard collection
         const query: any = { $or: [{ name: id }] }
         if (ObjectId.isValid(id)) {
             query.$or.push({ _id: new ObjectId(id) })

@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth'
 import fs from 'fs/promises'
 import path from 'path'
 import { getDb } from '@/lib/mongodb'
+import { GridFSBucket } from 'mongodb'
 
 export async function POST(request: Request) {
     try {
@@ -51,13 +52,22 @@ export async function POST(request: Request) {
         const sanitizedName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase()
         const fileName = `${Date.now()}_${sanitizedName}`
 
-        // 1. Save to MongoDB (Persistent database storage)
+        // 1. Save to MongoDB using GridFS (Handles >16MB files)
         const db = await getDb()
-        await db.collection('images').insertOne({
-            name: fileName,
-            data: buffer,
+        const bucket = new GridFSBucket(db, { bucketName: 'images' })
+
+        const uploadStream = bucket.openUploadStream(fileName, {
             contentType: file.type,
-            uploadDate: new Date()
+            metadata: {
+                originalName: file.name,
+                uploadDate: new Date()
+            }
+        })
+
+        await new Promise((resolve, reject) => {
+            uploadStream.on('error', reject)
+            uploadStream.on('finish', resolve)
+            uploadStream.end(buffer)
         })
 
         // The URL will point to our delivery API

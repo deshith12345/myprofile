@@ -858,13 +858,6 @@ export default function AdminDashboard() {
                                         .filter(a => achievementCategory === 'all' || a.category === achievementCategory)
                                         .map((achievement, idx) => (
                                             <Card key={achievement.id} className="p-6 bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 rounded-2xl relative group transition-all hover:bg-white dark:hover:bg-gray-800/60">
-                                                <button
-                                                    onClick={() => setLocalAchievements(localAchievements.filter(a => a.id !== achievement.id))}
-                                                    className="absolute top-4 right-4 p-2 text-red-500/50 hover:text-red-500 transition-colors z-10"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-
                                                 <div className="grid md:grid-cols-12 gap-8">
                                                     <div className="md:col-span-4 space-y-4">
                                                         <label className="text-[8px] font-black uppercase text-gray-500 block">
@@ -958,9 +951,9 @@ export default function AdminDashboard() {
                                                                                 setLocalAchievements(updated)
                                                                             }}
                                                                             className="text-[8px] text-red-400 hover:text-red-500 font-bold uppercase cursor-pointer"
-                                                                            title="Clear Organization"
+                                                                            title="Clear Organization Field"
                                                                         >
-                                                                            Remove
+                                                                            Clear Field
                                                                         </button>
                                                                     </div>
                                                                     <div className="flex items-center gap-3">
@@ -1100,6 +1093,14 @@ export default function AdminDashboard() {
                                                                 />
                                                             </div>
                                                         )}
+                                                        <div className="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-700/50 mt-4">
+                                                            <button
+                                                                onClick={() => setLocalAchievements(localAchievements.filter(a => a.id !== achievement.id))}
+                                                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 text-[10px] font-bold uppercase tracking-widest hover:bg-red-100 dark:hover:bg-red-500/20 transition-all"
+                                                            >
+                                                                <Trash2 className="w-3.5 h-3.5" /> Delete Entry
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </Card>
