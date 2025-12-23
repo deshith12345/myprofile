@@ -32,6 +32,9 @@ export interface Achievement {
   content?: string; // Extracted text content from reports
   location?: string;
   blogImage?: string; // Specific image for the blog view
+  category: AchievementCategory;
+  orgIconSlug?: string;
+  orgIconColor?: string;
 }
 
 export type AchievementCategory = 'award' | 'certification' | 'reports' | 'speaking' | 'event' | 'article';
