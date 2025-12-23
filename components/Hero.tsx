@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Download, ExternalLink, Github, Linkedin, Mail, Twitter } from 'lucide-react'
 import Image from 'next/image'
@@ -12,7 +12,7 @@ export function Hero({ profile, latestUpdate }: {
   profile: typeof ProfileType,
   latestUpdate?: { title: string, date: string, type: 'project' | 'achievement' }
 }) {
-  const roles = profile.roles || ['Cybersecurity Student', 'Security Analyst', 'Penetration Tester', 'Threat Hunter']
+  const roles = useMemo(() => profile.roles || ['Cybersecurity Student', 'Security Analyst', 'Penetration Tester', 'Threat Hunter'], [profile.roles])
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [displayText, setDisplayText] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
