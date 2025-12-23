@@ -1019,104 +1019,105 @@ export default function AdminDashboard() {
                                                                     )}
                                                                 </div>
                                                             )}
+                                                        </div>
 
-                                                            <div className="grid md:grid-cols-2 gap-8">
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[8px] font-black uppercase text-gray-500">Date</label>
-                                                                    <input
-                                                                        value={achievement.date}
-                                                                        onChange={(e) => {
-                                                                            const updated = [...localAchievements]
-                                                                            updated[idx].date = e.target.value
-                                                                            setLocalAchievements(updated)
-                                                                        }}
-                                                                        className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-medium text-gray-500 outline-none focus:border-primary-500 transition-all"
-                                                                    />
-                                                                </div>
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[8px] font-black uppercase text-gray-500">Category</label>
-                                                                    <select
-                                                                        value={achievement.category}
-                                                                        onChange={(e) => {
-                                                                            const updated = [...localAchievements]
-                                                                            updated[idx].category = e.target.value as any
-                                                                            setLocalAchievements(updated)
-                                                                        }}
-                                                                        className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-bold text-gray-400 outline-none focus:border-primary-500 appearance-none"
-                                                                    >
-                                                                        <option value="certification">Certification</option>
-                                                                        <option value="award">Award</option>
-                                                                        <option value="event">Event</option>
-                                                                        <option value="article">Article</option>
-                                                                        <option value="reports">Report</option>
-                                                                        <option value="speaking">Speaking</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-
-                                                            {(achievement.category === 'event' || achievement.category === 'speaking') && (
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[8px] font-black uppercase text-gray-500">Location / Venue</label>
-                                                                    <input
-                                                                        value={achievement.location || ''}
-                                                                        onChange={(e) => {
-                                                                            const updated = [...localAchievements]
-                                                                            updated[idx].location = e.target.value
-                                                                            setLocalAchievements(updated)
-                                                                        }}
-                                                                        placeholder="e.g. Las Vegas, NV"
-                                                                        className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-medium text-gray-500 outline-none focus:border-primary-500 transition-all"
-                                                                    />
-                                                                </div>
-                                                            )}
-
+                                                        <div className="grid md:grid-cols-2 gap-8">
                                                             <div className="space-y-1">
-                                                                <label className="text-[8px] font-black uppercase text-gray-500">
-                                                                    {achievement.category === 'reports' ? 'Executive Summary' : 'Description'}
-                                                                </label>
-                                                                <textarea
-                                                                    rows={3}
-                                                                    value={achievement.description}
+                                                                <label className="text-[8px] font-black uppercase text-gray-500">Date</label>
+                                                                <input
+                                                                    value={achievement.date}
                                                                     onChange={(e) => {
                                                                         const updated = [...localAchievements]
-                                                                        updated[idx].description = e.target.value
+                                                                        updated[idx].date = e.target.value
                                                                         setLocalAchievements(updated)
                                                                     }}
-                                                                    className="w-full bg-transparent border border-gray-200 dark:border-gray-700 p-3 rounded-xl text-xs text-gray-500 outline-none focus:border-primary-500 transition-all resize-none"
+                                                                    className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-medium text-gray-500 outline-none focus:border-primary-500 transition-all"
                                                                 />
                                                             </div>
-
-                                                            {achievement.category === 'reports' && (
-                                                                <div className="space-y-1">
-                                                                    <div className="flex justify-between items-center">
-                                                                        <label className="text-[8px] font-black uppercase text-gray-500">Report Content (Extracted)</label>
-                                                                        <span className="text-[8px] text-primary-500 cursor-pointer hover:underline" onClick={() => {
-                                                                            // Optional: Manual re-trigger or upload trigger could go here
-                                                                        }}>Auto-extracted from document</span>
-                                                                    </div>
-                                                                    <textarea
-                                                                        rows={10}
-                                                                        value={achievement.content || ''}
-                                                                        onChange={(e) => {
-                                                                            const updated = [...localAchievements]
-                                                                            updated[idx].content = e.target.value
-                                                                            setLocalAchievements(updated)
-                                                                        }}
-                                                                        className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl text-xs font-mono text-gray-600 dark:text-gray-300 outline-none focus:border-primary-500 transition-all resize-y"
-                                                                        placeholder="Content will appear here after document upload..."
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                            <div className="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-700/50 mt-4">
-                                                                <button
-                                                                    onClick={() => setLocalAchievements(localAchievements.filter(a => a.id !== achievement.id))}
-                                                                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 text-[10px] font-bold uppercase tracking-widest hover:bg-red-100 dark:hover:bg-red-500/20 transition-all"
+                                                            <div className="space-y-1">
+                                                                <label className="text-[8px] font-black uppercase text-gray-500">Category</label>
+                                                                <select
+                                                                    value={achievement.category}
+                                                                    onChange={(e) => {
+                                                                        const updated = [...localAchievements]
+                                                                        updated[idx].category = e.target.value as any
+                                                                        setLocalAchievements(updated)
+                                                                    }}
+                                                                    className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-bold text-gray-400 outline-none focus:border-primary-500 appearance-none"
                                                                 >
-                                                                    <Trash2 className="w-3.5 h-3.5" /> Delete This Achievement
-                                                                </button>
+                                                                    <option value="certification">Certification</option>
+                                                                    <option value="award">Award</option>
+                                                                    <option value="event">Event</option>
+                                                                    <option value="article">Article</option>
+                                                                    <option value="reports">Report</option>
+                                                                    <option value="speaking">Speaking</option>
+                                                                </select>
                                                             </div>
                                                         </div>
+
+                                                        {(achievement.category === 'event' || achievement.category === 'speaking') && (
+                                                            <div className="space-y-1">
+                                                                <label className="text-[8px] font-black uppercase text-gray-500">Location / Venue</label>
+                                                                <input
+                                                                    value={achievement.location || ''}
+                                                                    onChange={(e) => {
+                                                                        const updated = [...localAchievements]
+                                                                        updated[idx].location = e.target.value
+                                                                        setLocalAchievements(updated)
+                                                                    }}
+                                                                    placeholder="e.g. Las Vegas, NV"
+                                                                    className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-medium text-gray-500 outline-none focus:border-primary-500 transition-all"
+                                                                />
+                                                            </div>
+                                                        )}
+
+                                                        <div className="space-y-1">
+                                                            <label className="text-[8px] font-black uppercase text-gray-500">
+                                                                {achievement.category === 'reports' ? 'Executive Summary' : 'Description'}
+                                                            </label>
+                                                            <textarea
+                                                                rows={3}
+                                                                value={achievement.description}
+                                                                onChange={(e) => {
+                                                                    const updated = [...localAchievements]
+                                                                    updated[idx].description = e.target.value
+                                                                    setLocalAchievements(updated)
+                                                                }}
+                                                                className="w-full bg-transparent border border-gray-200 dark:border-gray-700 p-3 rounded-xl text-xs text-gray-500 outline-none focus:border-primary-500 transition-all resize-none"
+                                                            />
+                                                        </div>
+
+                                                        {achievement.category === 'reports' && (
+                                                            <div className="space-y-1">
+                                                                <div className="flex justify-between items-center">
+                                                                    <label className="text-[8px] font-black uppercase text-gray-500">Report Content (Extracted)</label>
+                                                                    <span className="text-[8px] text-primary-500 cursor-pointer hover:underline" onClick={() => {
+                                                                        // Optional: Manual re-trigger or upload trigger could go here
+                                                                    }}>Auto-extracted from document</span>
+                                                                </div>
+                                                                <textarea
+                                                                    rows={10}
+                                                                    value={achievement.content || ''}
+                                                                    onChange={(e) => {
+                                                                        const updated = [...localAchievements]
+                                                                        updated[idx].content = e.target.value
+                                                                        setLocalAchievements(updated)
+                                                                    }}
+                                                                    className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl text-xs font-mono text-gray-600 dark:text-gray-300 outline-none focus:border-primary-500 transition-all resize-y"
+                                                                    placeholder="Content will appear here after document upload..."
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <div className="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-700/50 mt-4">
+                                                            <button
+                                                                onClick={() => setLocalAchievements(localAchievements.filter(a => a.id !== achievement.id))}
+                                                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 text-[10px] font-bold uppercase tracking-widest hover:bg-red-100 dark:hover:bg-red-500/20 transition-all"
+                                                            >
+                                                                <Trash2 className="w-3.5 h-3.5" /> Delete This Achievement
+                                                            </button>
+                                                        </div>
                                                     </div>
+                                                </div>
                                             </Card>
                                         ))}
                                 </div>
