@@ -939,8 +939,6 @@ export default function AdminDashboard() {
                                                                 />
                                                             </div>
                                                             {achievement.category !== 'reports' && (
-                                                                <div className="space-y-1">
-                                                            {achievement.category !== 'reports' && (
                                                                 <div className="space-y-2">
                                                                     {!achievement.organization ? (
                                                                         <button
@@ -957,7 +955,7 @@ export default function AdminDashboard() {
                                                                         <div className="bg-gray-100 dark:bg-gray-900/50 p-3 rounded-xl border border-gray-200 dark:border-gray-700/50">
                                                                             <div className="flex justify-between items-center mb-2">
                                                                                 <label className="text-[8px] font-black uppercase text-gray-500">Organization / Host</label>
-                                                                                <button 
+                                                                                <button
                                                                                     onClick={() => {
                                                                                         const updated = [...localAchievements]
                                                                                         updated[idx].organization = ""
@@ -1021,43 +1019,42 @@ export default function AdminDashboard() {
                                                                     )}
                                                                 </div>
                                                             )}
-                                                        </div>
 
-                                                        <div className="grid md:grid-cols-2 gap-8">
-                                                            <div className="space-y-1">
-                                                                <label className="text-[8px] font-black uppercase text-gray-500">Date</label>
-                                                                <input
-                                                                    value={achievement.date}
-                                                                    onChange={(e) => {
-                                                                        const updated = [...localAchievements]
-                                                                        updated[idx].date = e.target.value
-                                                                        setLocalAchievements(updated)
-                                                                    }}
-                                                                    className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-medium text-gray-500 outline-none focus:border-primary-500 transition-all"
-                                                                />
+                                                            <div className="grid md:grid-cols-2 gap-8">
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[8px] font-black uppercase text-gray-500">Date</label>
+                                                                    <input
+                                                                        value={achievement.date}
+                                                                        onChange={(e) => {
+                                                                            const updated = [...localAchievements]
+                                                                            updated[idx].date = e.target.value
+                                                                            setLocalAchievements(updated)
+                                                                        }}
+                                                                        className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-medium text-gray-500 outline-none focus:border-primary-500 transition-all"
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[8px] font-black uppercase text-gray-500">Category</label>
+                                                                    <select
+                                                                        value={achievement.category}
+                                                                        onChange={(e) => {
+                                                                            const updated = [...localAchievements]
+                                                                            updated[idx].category = e.target.value as any
+                                                                            setLocalAchievements(updated)
+                                                                        }}
+                                                                        className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-bold text-gray-400 outline-none focus:border-primary-500 appearance-none"
+                                                                    >
+                                                                        <option value="certification">Certification</option>
+                                                                        <option value="award">Award</option>
+                                                                        <option value="event">Event</option>
+                                                                        <option value="article">Article</option>
+                                                                        <option value="reports">Report</option>
+                                                                        <option value="speaking">Speaking</option>
+                                                                    </select>
+                                                                </div>
                                                             </div>
-                                                            <div className="space-y-1">
-                                                                <label className="text-[8px] font-black uppercase text-gray-500">Category</label>
-                                                                <select
-                                                                    value={achievement.category}
-                                                                    onChange={(e) => {
-                                                                        const updated = [...localAchievements]
-                                                                        updated[idx].category = e.target.value as any
-                                                                        setLocalAchievements(updated)
-                                                                    }}
-                                                                    className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-xs font-bold text-gray-400 outline-none focus:border-primary-500 appearance-none"
-                                                                >
-                                                                    <option value="certification">Certification</option>
-                                                                    <option value="award">Award</option>
-                                                                    <option value="event">Event</option>
-                                                                    <option value="article">Article</option>
-                                                                    <option value="reports">Report</option>
-                                                                    <option value="speaking">Speaking</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
 
-                                                        {(achievement.category === 'event' || achievement.category === 'speaking') && (
+                                                            {(achievement.category === 'event' || achievement.category === 'speaking') && (
                                                                 <div className="space-y-1">
                                                                     <label className="text-[8px] font-black uppercase text-gray-500">Location / Venue</label>
                                                                     <input
