@@ -821,7 +821,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="flex gap-2 flex-wrap">
                                         <div className="flex bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700 overflow-x-auto max-w-[200px] md:max-w-none">
-                                            {['all', 'award', 'certification', 'reports', 'speaking', 'event', 'article'].map((cat) => (
+                                            {['award', 'certification', 'reports', 'speaking', 'event', 'article'].map((cat) => (
                                                 <button
                                                     key={cat}
                                                     onClick={() => setAchievementCategory(cat as AchievementCategory | 'all')}
@@ -830,7 +830,7 @@ export default function AdminDashboard() {
                                                         : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                                                         }`}
                                                 >
-                                                    {cat === 'all' ? 'All' : cat}
+                                                    {cat}
                                                 </button>
                                             ))}
                                         </div>
@@ -947,7 +947,22 @@ export default function AdminDashboard() {
                                                             </div>
                                                             {achievement.category !== 'reports' && (
                                                                 <div className="space-y-1">
-                                                                    <label className="text-[8px] font-black uppercase text-gray-500">Organization / Host</label>
+                                                                    <div className="flex justify-between items-center">
+                                                                        <label className="text-[8px] font-black uppercase text-gray-500">Organization / Host</label>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                const updated = [...localAchievements]
+                                                                                updated[idx].organization = ""
+                                                                                updated[idx].orgIconSlug = undefined
+                                                                                updated[idx].orgIconColor = undefined
+                                                                                setLocalAchievements(updated)
+                                                                            }}
+                                                                            className="text-[8px] text-red-400 hover:text-red-500 font-bold uppercase cursor-pointer"
+                                                                            title="Clear Organization"
+                                                                        >
+                                                                            Remove
+                                                                        </button>
+                                                                    </div>
                                                                     <div className="flex items-center gap-3">
                                                                         <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden shrink-0 relative">
                                                                             {achievement.orgIconSlug && (
@@ -978,7 +993,7 @@ export default function AdminDashboard() {
                                                                                 setLocalAchievements(updated)
                                                                             }}
                                                                             placeholder="e.g., CompTIA, Cisco, IBM"
-                                                                            className="flex-1 bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-primary-500 transition-all"
+                                                                            className="flex-1 bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-primary-500 transition-all font-mono"
                                                                         />
                                                                         <button
                                                                             title="Auto-detect Organization Logo"
