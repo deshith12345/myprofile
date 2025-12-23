@@ -7,7 +7,6 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { scrollToElement } from '@/lib/utils'
 import { profile as ProfileType } from '@/data/profile'
-import { SeasonalEffects } from '@/components/SeasonalEffects'
 
 export function Hero({ profile, latestUpdate }: {
   profile: typeof ProfileType,
@@ -93,8 +92,33 @@ export function Hero({ profile, latestUpdate }: {
       {/* Animated Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 -z-10" />
 
-      {/* Seasonal Effects - Performance Optimized */}
-      <SeasonalEffects />
+      {/* Particle Effect Background - Disabled on mobile to save performance */}
+      {isClient && typeof window !== 'undefined' && window.innerWidth >= 768 && (
+        <div className="absolute inset-0 -z-10 pointer-events-none">
+          {[...Array(30)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-primary-400 dark:bg-primary-600 rounded-full opacity-30"
+              initial={{
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+              }}
+              animate={{
+                y: [
+                  null,
+                  Math.random() * window.innerHeight,
+                ],
+                opacity: [0.3, 0.6, 0.3],
+              }}
+              transition={{
+                duration: Math.random() * 5 + 5, // Slower transitions
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <motion.div
