@@ -940,7 +940,7 @@ export default function AdminDashboard() {
                                                             </div>
                                                             {achievement.category !== 'reports' && (
                                                                 <div className="space-y-1">
-                                                                    <div className="flex justify-between items-center">
+                                                                    <div className="flex justify-between items-center mb-1">
                                                                         <label className="text-[8px] font-black uppercase text-gray-500">Organization / Host</label>
                                                                         <button
                                                                             onClick={() => {
@@ -950,10 +950,10 @@ export default function AdminDashboard() {
                                                                                 updated[idx].orgIconColor = undefined
                                                                                 setLocalAchievements(updated)
                                                                             }}
-                                                                            className="text-[8px] text-red-400 hover:text-red-500 font-bold uppercase cursor-pointer"
-                                                                            title="Clear Organization Field"
+                                                                            className="text-[8px] text-orange-400 hover:text-orange-600 font-bold uppercase cursor-pointer hover:bg-orange-50 px-2 py-0.5 rounded"
+                                                                            title="Clear only the organization field"
                                                                         >
-                                                                            Clear Field
+                                                                            Clear Organization
                                                                         </button>
                                                                     </div>
                                                                     <div className="flex items-center gap-3">
@@ -1098,7 +1098,7 @@ export default function AdminDashboard() {
                                                                 onClick={() => setLocalAchievements(localAchievements.filter(a => a.id !== achievement.id))}
                                                                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 text-[10px] font-bold uppercase tracking-widest hover:bg-red-100 dark:hover:bg-red-500/20 transition-all"
                                                             >
-                                                                <Trash2 className="w-3.5 h-3.5" /> Delete Entry
+                                                                <Trash2 className="w-3.5 h-3.5" /> Delete This Achievement
                                                             </button>
                                                         </div>
                                                     </div>
