@@ -604,17 +604,6 @@ export default function AdminDashboard() {
                                                         <div className="flex items-center gap-2">
                                                             <input
                                                                 value={skill.name}
-                                                                onBlur={() => {
-                                                                    // Auto-detect icon if current icon is empty or default
-                                                                    if (!skill.icon || skill.icon === 'shield') {
-                                                                        const iconData = findBrandIcon(skill.name);
-                                                                        const updated = [...localSkills];
-                                                                        updated[idx].icon = iconData.slug;
-                                                                        updated[idx].brandColor = iconData.color;
-                                                                        updated[idx].isBrandIcon = true;
-                                                                        setLocalSkills(updated);
-                                                                    }
-                                                                }}
                                                                 onChange={(e) => {
                                                                     const updated = [...localSkills]
                                                                     updated[idx].name = e.target.value
@@ -622,20 +611,6 @@ export default function AdminDashboard() {
                                                                 }}
                                                                 className="w-full bg-transparent border-none p-0 text-sm font-bold text-gray-900 dark:text-white outline-none focus:ring-0"
                                                             />
-                                                            <button
-                                                                title="Auto-detect Icon"
-                                                                onClick={() => {
-                                                                    const iconData = findBrandIcon(skill.name);
-                                                                    const updated = [...localSkills];
-                                                                    updated[idx].icon = iconData.slug;
-                                                                    updated[idx].brandColor = iconData.color;
-                                                                    updated[idx].isBrandIcon = true;
-                                                                    setLocalSkills(updated);
-                                                                }}
-                                                                className="p-1 hover:text-primary-500 transition-colors"
-                                                            >
-                                                                <Wand2 className="w-3 h-3" />
-                                                            </button>
                                                             <button
                                                                 title="Auto-fetch Official Logo from Internet"
                                                                 onClick={async () => {
@@ -1079,13 +1054,6 @@ export default function AdminDashboard() {
                                                                                 </div>
                                                                                 <input
                                                                                     value={achievement.organization || ''}
-                                                                                    onBlur={() => {
-                                                                                        const iconData = findOrganizationIcon(achievement.organization || '');
-                                                                                        const updated = [...localAchievements];
-                                                                                        updated[idx].orgIconSlug = iconData.slug;
-                                                                                        updated[idx].orgIconColor = iconData.color;
-                                                                                        setLocalAchievements(updated);
-                                                                                    }}
                                                                                     onChange={(e) => {
                                                                                         const updated = [...localAchievements]
                                                                                         updated[idx].organization = e.target.value
@@ -1144,19 +1112,6 @@ export default function AdminDashboard() {
                                                                                     ) : (
                                                                                         <Search className="w-4 h-4" />
                                                                                     )}
-                                                                                </button>
-                                                                                <button
-                                                                                    title="Auto-detect Organization Logo"
-                                                                                    onClick={() => {
-                                                                                        const iconData = findOrganizationIcon(achievement.organization || '');
-                                                                                        const updated = [...localAchievements];
-                                                                                        updated[idx].orgIconSlug = iconData.slug;
-                                                                                        updated[idx].orgIconColor = iconData.color;
-                                                                                        setLocalAchievements(updated);
-                                                                                    }}
-                                                                                    className="p-1.5 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-                                                                                >
-                                                                                    <Wand2 className="w-4 h-4" />
                                                                                 </button>
                                                                             </div>
                                                                         </div>
