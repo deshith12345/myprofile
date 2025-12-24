@@ -1,90 +1,248 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { getDb } from '@/lib/mongodb';
-import { GridFSBucket } from 'mongodb';
-import { findBrandIcon } from '@/lib/icon-utils';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60; // Allow enough time for search + download + GridFS save
 
-/** Helper – generate a safe filename from the org name */
-function slugify(name: string): string {
-    return name
-        .toLowerCase()
-        .replace(/[^\w]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+/**
+ * Logo fetching API - Rebuilt from scratch
+ * Priority:
+ * 1. Google Custom Search (best quality, works for anything)
+ * 2. Simple Icons CDN (covers 3000+ tech brands - no API key needed)
+ * 3. Clearbit Logo API (covers companies with domains - no API key needed)
+ */
+
+// Common tech brand slug mappings for Simple Icons
+const SLUG_MAPPINGS: Record<string, string> = {
+    // Programming languages
+    'python': 'python',
+    'javascript': 'javascript',
+    'typescript': 'typescript',
+    'java': 'openjdk',
+    'c++': 'cplusplus',
+    'c#': 'csharp',
+    'c': 'c',
+    'go': 'go',
+    'rust': 'rust',
+    'ruby': 'ruby',
+    'php': 'php',
+    'swift': 'swift',
+    'kotlin': 'kotlin',
+    'scala': 'scala',
+    'r': 'r',
+    'perl': 'perl',
+    'lua': 'lua',
+    'dart': 'dart',
+
+    // Frameworks & Libraries
+    'react': 'react',
+    'vue': 'vuedotjs',
+    'vue.js': 'vuedotjs',
+    'angular': 'angular',
+    'svelte': 'svelte',
+    'next.js': 'nextdotjs',
+    'nextjs': 'nextdotjs',
+    'nuxt': 'nuxtdotjs',
+    'express': 'express',
+    'django': 'django',
+    'flask': 'flask',
+    'fastapi': 'fastapi',
+    'spring': 'spring',
+    'spring boot': 'springboot',
+    'rails': 'rubyonrails',
+    'laravel': 'laravel',
+    '.net': 'dotnet',
+    'dotnet': 'dotnet',
+    'node': 'nodedotjs',
+    'node.js': 'nodedotjs',
+    'nodejs': 'nodedotjs',
+    'jquery': 'jquery',
+    'bootstrap': 'bootstrap',
+    'tailwind': 'tailwindcss',
+    'tailwindcss': 'tailwindcss',
+
+    // Databases
+    'mongodb': 'mongodb',
+    'mysql': 'mysql',
+    'postgresql': 'postgresql',
+    'postgres': 'postgresql',
+    'redis': 'redis',
+    'sqlite': 'sqlite',
+    'firebase': 'firebase',
+    'supabase': 'supabase',
+    'prisma': 'prisma',
+
+    // Cloud & DevOps
+    'aws': 'amazonaws',
+    'amazon': 'amazonaws',
+    'azure': 'microsoftazure',
+    'gcp': 'googlecloud',
+    'google cloud': 'googlecloud',
+    'docker': 'docker',
+    'kubernetes': 'kubernetes',
+    'k8s': 'kubernetes',
+    'terraform': 'terraform',
+    'ansible': 'ansible',
+    'jenkins': 'jenkins',
+    'github': 'github',
+    'gitlab': 'gitlab',
+    'vercel': 'vercel',
+    'netlify': 'netlify',
+    'heroku': 'heroku',
+    'digitalocean': 'digitalocean',
+    'cloudflare': 'cloudflare',
+    'nginx': 'nginx',
+
+    // Security Tools
+    'wireshark': 'wireshark',
+    'metasploit': 'metasploit',
+    'burp suite': 'burpsuite',
+    'burpsuite': 'burpsuite',
+    'nmap': 'nmap',
+    'kali linux': 'kalilinux',
+    'kali': 'kalilinux',
+    'parrot': 'parrotsecurity',
+    'splunk': 'splunk',
+    'owasp': 'owasp',
+
+    // Operating Systems
+    'linux': 'linux',
+    'ubuntu': 'ubuntu',
+    'debian': 'debian',
+    'fedora': 'fedora',
+    'centos': 'centos',
+    'arch linux': 'archlinux',
+    'windows': 'windows',
+    'macos': 'macos',
+    'android': 'android',
+    'ios': 'ios',
+
+    // Version Control & Tools
+    'git': 'git',
+    'bitbucket': 'bitbucket',
+    'jira': 'jira',
+    'slack': 'slack',
+    'discord': 'discord',
+    'figma': 'figma',
+    'vscode': 'visualstudiocode',
+    'visual studio code': 'visualstudiocode',
+
+    // Companies
+    'google': 'google',
+    'microsoft': 'microsoft',
+    'apple': 'apple',
+    'meta': 'meta',
+    'ibm': 'ibm',
+    'cisco': 'cisco',
+    'comptia': 'comptia',
+    'fortinet': 'fortinet',
+    'crowdstrike': 'crowdstrike',
+    'palo alto': 'paloaltonetworks',
+    'hashicorp': 'hashicorp',
+    'redhat': 'redhat',
+    'red hat': 'redhat',
+    'vmware': 'vmware',
+    'salesforce': 'salesforce',
+    'oracle': 'oracle',
+    'nvidia': 'nvidia',
+
+    // Learning Platforms
+    'udemy': 'udemy',
+    'coursera': 'coursera',
+    'linkedin': 'linkedin',
+    'tryhackme': 'tryhackme',
+    'hackthebox': 'hackthebox',
+
+    // Other tools
+    'bash': 'gnubash',
+    'powershell': 'powershell',
+    'html': 'html5',
+    'html5': 'html5',
+    'css': 'css3',
+    'css3': 'css3',
+    'sass': 'sass',
+    'webpack': 'webpack',
+    'vite': 'vite',
+    'npm': 'npm',
+    'yarn': 'yarn',
+    'graphql': 'graphql',
+    'postman': 'postman',
+};
+
+function findSlug(name: string): string | null {
+    const normalized = name.toLowerCase().trim();
+    if (SLUG_MAPPINGS[normalized]) return SLUG_MAPPINGS[normalized];
+
+    const cleaned = normalized.replace(/[^a-z0-9]/g, '');
+    for (const [key, slug] of Object.entries(SLUG_MAPPINGS)) {
+        if (key.replace(/[^a-z0-9]/g, '') === cleaned) return slug;
+    }
+    return cleaned || null;
 }
 
-async function tryClearbit(org: string, slug: string, gridPrefix: string, bucket: GridFSBucket) {
-    // If org looks like a domain, use it. Otherwise, try multiple common extensions
-    let domainsToCheck: string[] = [];
+async function tryGoogleSearch(query: string): Promise<string | null> {
+    const apiKey = process.env.GOOGLE_SEARCH_API_KEY;
+    const searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID;
 
-    if (org.includes('.') && !org.includes(' ')) {
-        const hostname = org.includes('://') ? new URL(org).hostname : org;
-        domainsToCheck.push(hostname);
-    } else {
-        domainsToCheck = [`${slug}.com`, `${slug}.io`, `${slug}.org`, `${slug}.net`, `${slug}.co`];
-    }
+    if (!apiKey || !searchEngineId) return null;
 
-    // Try each domain until we find a match
-    for (const domain of domainsToCheck) {
-        const clearbitUrl = `https://logo.clearbit.com/${domain}`;
-        try {
-            const response = await fetch(clearbitUrl, { method: 'HEAD' });
-            if (response.ok) {
-                // Found it! Download and save
-                const logoResponse = await fetch(clearbitUrl);
-                const buffer = Buffer.from(await logoResponse.arrayBuffer());
+    try {
+        const searchQuery = `${query} logo png transparent`;
+        const url = new URL('https://www.googleapis.com/customsearch/v1');
+        url.searchParams.set('key', apiKey);
+        url.searchParams.set('cx', searchEngineId);
+        url.searchParams.set('q', searchQuery);
+        url.searchParams.set('searchType', 'image');
+        url.searchParams.set('num', '5');
+        url.searchParams.set('imgSize', 'medium');
+        url.searchParams.set('fileType', 'png');
 
-                const filename = `${gridPrefix}-${crypto.randomBytes(4).toString('hex')}.png`;
-                const uploadStream = bucket.openUploadStream(filename, {
-                    metadata: {
-                        contentType: 'image/png',
-                        originalName: `${org} Logo`,
-                        source: 'clearbit',
-                        sourceUrl: clearbitUrl,
-                        uploadDate: new Date()
-                    }
-                });
+        const response = await fetch(url.toString(), {
+            signal: AbortSignal.timeout(8000)
+        });
+        const data = await response.json();
 
-                await new Promise((resolve, reject) => {
-                    uploadStream.on('error', reject);
-                    uploadStream.on('finish', resolve);
-                    uploadStream.end(buffer);
-                });
+        if (response.ok && data.items?.length > 0) {
+            // Find best candidate (prefer png/svg)
+            const best = data.items.find((item: any) =>
+                /\.(png|svg)$/i.test(item.link)
+            ) || data.items[0];
 
-                return { url: `/api/images/${filename}`, source: 'clearbit' };
-            }
-        } catch (err) {
-            // Ignore error and try next domain
-            console.error(`Clearbit fetch failed for ${domain}:`, err);
+            return best.link;
         }
+    } catch (error) {
+        console.error('Google Search failed:', error);
     }
-
     return null;
 }
 
-async function trySimpleIcons(org: string) {
-    // Check if it matches a known simple icon
+async function trySimpleIcons(slug: string): Promise<string | null> {
     try {
-        const iconData = findBrandIcon(org);
-        // findBrandIcon always returns a slug object, but we want to check if it's a "real" match.
-        // The current implementation returns a guessed slug even if not found in local metadata.
-        // However, we can try to HEAD the CDN url to verify it exists.
+        const url = `https://cdn.simpleicons.org/${slug}`;
+        const response = await fetch(url, {
+            method: 'HEAD',
+            signal: AbortSignal.timeout(3000)
+        });
+        if (response.ok) return url;
+    } catch (error) {
+        // Ignore
+    }
+    return null;
+}
 
-        const cdnUrl = `https://cdn.simpleicons.org/${iconData.slug}/${iconData.color || 'default'}`;
+async function tryClearbit(name: string): Promise<string | null> {
+    const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const domains = [`${slug}.com`, `${slug}.io`, `${slug}.org`, `${slug}.co`];
 
-        // We verify if this slug actually exists on Simple Icons CDN
-        const response = await fetch(cdnUrl, { method: 'HEAD' });
-        if (response.ok) {
-            return {
-                url: cdnUrl,
-                source: 'simple-icons',
-                cached: false // We don't cache CDN links in GridFS to save space/bandwidth, frontend renders them directly
-            };
+    for (const domain of domains) {
+        try {
+            const url = `https://logo.clearbit.com/${domain}`;
+            const response = await fetch(url, {
+                method: 'HEAD',
+                signal: AbortSignal.timeout(2000)
+            });
+            if (response.ok) return url;
+        } catch (error) {
+            // Continue
         }
-    } catch (err) {
-        console.error('Simple Icons verification failed:', err);
     }
     return null;
 }
@@ -97,100 +255,39 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Missing org query parameter' }, { status: 400 });
     }
 
-    const db = await getDb();
-    const bucket = new GridFSBucket(db, { bucketName: 'images' });
-    const slug = slugify(org);
-    const gridPrefix = `logo_${slug}`;
-
-    // 1. Check if we already have this logo in GridFS
-    const existingFiles = await bucket.find({ filename: { $regex: new RegExp(`^${gridPrefix}`) } }).toArray();
-    if (existingFiles.length > 0) {
-        return NextResponse.json({
-            url: `/api/images/${existingFiles[0].filename}`,
-            cached: true
-        });
-    }
-
-    const apiKey = process.env.GOOGLE_SEARCH_API_KEY;
-    const searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID;
-
-    // 2. Google Custom Search (Primary)
-    if (apiKey && searchEngineId) {
-        try {
-            const searchQuery = `${org} official logo brand icon png transparent`;
-            const searchUrl = new URL('https://www.googleapis.com/customsearch/v1');
-            searchUrl.searchParams.set('key', apiKey);
-            searchUrl.searchParams.set('cx', searchEngineId);
-            searchUrl.searchParams.set('q', searchQuery);
-            searchUrl.searchParams.set('searchType', 'image');
-            searchUrl.searchParams.set('num', '3'); // Reduced from 5 to save quota
-            searchUrl.searchParams.set('imgSize', 'medium');
-
-            const searchResponse = await fetch(searchUrl.toString());
-            const searchData = await searchResponse.json();
-
-            if (searchResponse.ok && searchData.items && searchData.items.length > 0) {
-                // Filter and pick the best candidate
-                const candidate = searchData.items.find((item: any) => {
-                    const url = item.link as string;
-                    // Prefer PNGs or SVGs from reputable sources
-                    return /\.(png|svg)$/i.test(url);
-                }) || searchData.items[0];
-
-                const logoUrl = candidate.link;
-                const logoResponse = await fetch(logoUrl);
-
-                if (logoResponse.ok) {
-                    const contentType = logoResponse.headers.get('content-type') || 'image/png';
-
-                    // Only accept images
-                    if (contentType.startsWith('image/')) {
-                        const buffer = Buffer.from(await logoResponse.arrayBuffer());
-                        const urlExt = new URL(logoUrl).pathname.split('.').pop();
-                        const ext = urlExt && urlExt.length < 5 ? `.${urlExt}` : '.png';
-
-                        const filename = `${gridPrefix}-${crypto.randomBytes(4).toString('hex')}${ext}`;
-
-                        const uploadStream = bucket.openUploadStream(filename, {
-                            metadata: {
-                                contentType,
-                                originalName: `${org} Logo`,
-                                source: 'google',
-                                sourceUrl: logoUrl,
-                                uploadDate: new Date()
-                            }
-                        });
-
-                        await new Promise((resolve, reject) => {
-                            uploadStream.on('error', reject);
-                            uploadStream.on('finish', resolve);
-                            uploadStream.end(buffer);
-                        });
-
-                        return NextResponse.json({ url: `/api/images/${filename}`, source: 'google' });
-                    }
-                }
-            }
-        } catch (err) {
-            console.error('Google search failed, falling back to next provider:', err);
+    // 1. Try Simple Icons first (fastest for tech brands)
+    const slug = findSlug(org);
+    if (slug) {
+        const simpleIconUrl = await trySimpleIcons(slug);
+        if (simpleIconUrl) {
+            return NextResponse.json({ url: simpleIconUrl, source: 'simple-icons' });
         }
     }
 
-    // 3. Simple Icons Fallback (Fast & Reliable for tech brands)
-    const simpleIconsResult = await trySimpleIcons(org);
-    if (simpleIconsResult) {
-        return NextResponse.json(simpleIconsResult);
+    // 2. Try raw slug
+    const rawSlug = org.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (rawSlug && rawSlug !== slug) {
+        const rawIconUrl = await trySimpleIcons(rawSlug);
+        if (rawIconUrl) {
+            return NextResponse.json({ url: rawIconUrl, source: 'simple-icons' });
+        }
     }
 
-    // 4. Fallback to Clearbit if Google failed or skipped
-    const clearbitResult = await tryClearbit(org, slug, gridPrefix, bucket);
-    if (clearbitResult) {
-        return NextResponse.json(clearbitResult);
+    // 3. Try Google Search (works for anything)
+    const googleUrl = await tryGoogleSearch(org);
+    if (googleUrl) {
+        return NextResponse.json({ url: googleUrl, source: 'google' });
     }
 
-    // 5. Ultimate Failure
+    // 4. Try Clearbit
+    const clearbitUrl = await tryClearbit(org);
+    if (clearbitUrl) {
+        return NextResponse.json({ url: clearbitUrl, source: 'clearbit' });
+    }
+
+    // 5. Not found
     return NextResponse.json(
-        { error: 'No logo found. Try uploading a custom image or check search API configuration.' },
+        { error: `No logo found for "${org}"` },
         { status: 404 }
     );
 }
