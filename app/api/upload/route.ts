@@ -5,6 +5,10 @@ import path from 'path'
 import { getDb } from '@/lib/mongodb'
 import { GridFSBucket } from 'mongodb'
 
+// Allow larger uploads and extended timeout
+export const runtime = 'nodejs'
+export const maxDuration = 60 // 60 seconds for large file uploads
+
 export async function POST(request: Request) {
     try {
         const session = await getSession()
