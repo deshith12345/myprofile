@@ -55,17 +55,23 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*',
         }
 
         setIsUploading(true)
-        const formData = new FormData()
-        formData.append('file', file)
 
         try {
-            const data = await uploadFileAction(formData)
-            if (data.success) {
-                onUpload(data.url!)
-                // We keep the previewUrl intentionally to avoid 404 flickering while Vercel redeploys
+            // Check if file is large (> 4MB) to use chunked strategy
+            if (file.size > 4 * 1024 * 1024) {
+                await uploadChunkedFile(file)
             } else {
-                alert(`Upload failed: ${data.message}`)
-                setPreviewUrl(null)
+                // Standard Server Action Upload
+                const formData = new FormData()
+                formData.append('file', file)
+
+                const data = await uploadFileAction(formData)
+                if (data.success) {
+                    onUpload(data.url!)
+                } else {
+                    alert(`Upload failed: ${data.message}`)
+                    setPreviewUrl(null)
+                }
             }
         } catch (err) {
             console.error('Upload failed:', err)
@@ -73,6 +79,42 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*',
             setPreviewUrl(null)
         } finally {
             setIsUploading(false)
+        }
+    }
+
+    const uploadChunkedFile = async (file: File) => {
+        const CHUNK_SIZE = 2 * 1024 * 1024 // 2MB chunks to be safe
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
+        const uploadId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+        for (let i = 0; i < totalChunks; i++) {
+            const start = i * CHUNK_SIZE
+            const end = Math.min(file.size, start + CHUNK_SIZE)
+            const chunk = file.slice(start, end)
+
+            const formData = new FormData()
+            formData.append('chunkIndex', i.toString())
+            formData.append('totalChunks', totalChunks.toString())
+            formData.append('uploadId', uploadId)
+            formData.append('fileName', file.name)
+            formData.append('contentType', file.type)
+            formData.append('file', chunk)
+
+            // Call API directly for chunks (avoid server action payload limits)
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+
+            const result = await res.json()
+            if (!result.success) {
+                throw new Error(result.message || 'Chunk upload failed')
+            }
+
+            if (i === totalChunks - 1) {
+                // Final chunk response contains the URL
+                onUpload(result.url)
+            }
         }
     }
 
@@ -545,9 +587,6 @@ export default function AdminDashboard() {
                                                                 src={skill.customIconUrl === 'loading' ? '#' : skill.customIconUrl}
                                                                 alt=""
                                                                 className={`w-full h-full object-contain ${skill.customIconUrl === 'loading' ? 'animate-pulse opacity-20' : ''}`}
-                                                                onError={(e) => {
-                                                                    e.currentTarget.style.display = 'none';
-                                                                }}
                                                             />
                                                         ) : skill.isBrandIcon && skill.icon ? (
                                                             /* eslint-disable-next-line @next/next/no-img-element */
@@ -555,9 +594,6 @@ export default function AdminDashboard() {
                                                                 src={`https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}`}
                                                                 alt=""
                                                                 className="w-full h-full object-contain"
-                                                                onError={(e) => {
-                                                                    e.currentTarget.style.display = 'none';
-                                                                }}
                                                             />
                                                         ) : (
                                                             <div className="text-gray-400 text-[8px] font-black uppercase text-center leading-tight">No<br />Icon</div>
@@ -659,13 +695,16 @@ export default function AdminDashboard() {
                                                     <label className="text-[8px] font-black uppercase text-gray-500">Mastery ({skill.proficiency}%)</label>
                                                     <input
                                                         type="range"
+                                                        min="0"
+                                                        max="100"
                                                         value={skill.proficiency}
                                                         onChange={(e) => {
-                                                            const updated = [...localSkills]
-                                                            updated[idx].proficiency = parseInt(e.target.value)
-                                                            setLocalSkills(updated)
+                                                            const val = parseInt(e.target.value);
+                                                            const updated = [...localSkills];
+                                                            updated[idx].proficiency = val;
+                                                            setLocalSkills(updated);
                                                         }}
-                                                        className="w-full accent-primary-500 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full cursor-pointer"
+                                                        className="w-full accent-primary-500 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full cursor-pointer relative z-10"
                                                     />
                                                 </div>
                                                 <div className="md:col-span-1 flex justify-end">

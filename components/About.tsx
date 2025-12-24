@@ -48,14 +48,19 @@ function SkillCard({ skill }: { skill: Skill }) {
 
     if (brandIconUrl === currentUrl && imageStatus === 'loaded') return;
 
-    setCurrentUrl(brandIconUrl)
-    // Start as loading unless we are just re-verifying
-    if (brandIconUrl !== currentUrl) setImageStatus('loading')
+    if (brandIconUrl !== currentUrl) {
+      setCurrentUrl(brandIconUrl)
+      setImageStatus('loading')
+    }
 
     const img = new Image()
     img.src = brandIconUrl
-    img.onload = () => setImageStatus('loaded')
-    img.onerror = () => setImageStatus('error')
+    img.onload = () => {
+      if (img.src === brandIconUrl) setImageStatus('loaded')
+    }
+    img.onerror = () => {
+      if (img.src === brandIconUrl) setImageStatus('error')
+    }
 
     return () => {
       img.onload = null

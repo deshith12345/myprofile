@@ -14,6 +14,41 @@ function slugify(name: string): string {
         .replace(/^-+|-+$/g, '');
 }
 
+async function tryClearbit(org: string, slug: string, gridPrefix: string, bucket: GridFSBucket) {
+    // If org looks like a domain, use it. Otherwise, guess {slug}.com
+    const domain = org.includes('.') ? (org.includes('://') ? new URL(org).hostname : org) : `${slug}.com`;
+    const clearbitUrl = `https://logo.clearbit.com/${domain}`;
+
+    try {
+        const response = await fetch(clearbitUrl, { method: 'HEAD' });
+        if (response.ok) {
+            const logoResponse = await fetch(clearbitUrl);
+            const buffer = Buffer.from(await logoResponse.arrayBuffer());
+
+            const filename = `${gridPrefix}-${crypto.randomBytes(4).toString('hex')}.png`;
+            const uploadStream = bucket.openUploadStream(filename, {
+                metadata: {
+                    contentType: 'image/png',
+                    originalName: `${org} Logo`,
+                    source: 'clearbit',
+                    uploadDate: new Date()
+                }
+            });
+
+            await new Promise((resolve, reject) => {
+                uploadStream.on('error', reject);
+                uploadStream.on('finish', resolve);
+                uploadStream.end(buffer);
+            });
+
+            return { url: `/api/images/${filename}`, source: 'clearbit' };
+        }
+    } catch (err) {
+        console.error('Clearbit fetch failed:', err);
+    }
+    return null;
+}
+
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const org = searchParams.get('org')?.trim();
@@ -28,7 +63,6 @@ export async function GET(req: NextRequest) {
     const gridPrefix = `logo_${slug}`;
 
     // 1. Check if we already have this logo in GridFS
-    // We search for files starting with "logo_{slug}"
     const existingFiles = await bucket.find({ filename: { $regex: new RegExp(`^${gridPrefix}`) } }).toArray();
     if (existingFiles.length > 0) {
         return NextResponse.json({
@@ -37,123 +71,80 @@ export async function GET(req: NextRequest) {
         });
     }
 
-    // Check for API key
     const apiKey = process.env.GOOGLE_SEARCH_API_KEY;
     const searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID;
 
-    if (!apiKey || !searchEngineId) {
-        // Fallback: Try Clearbit Logo API (no key needed)
-        const clearbitUrl = `https://logo.clearbit.com/${slug}.com`;
-
+    // 2. Google Custom Search (Primary)
+    if (apiKey && searchEngineId) {
         try {
-            const response = await fetch(clearbitUrl, { method: 'HEAD' });
-            if (response.ok) {
-                // Logo exists, download and cache it in GridFS
-                const logoResponse = await fetch(clearbitUrl);
-                const buffer = Buffer.from(await logoResponse.arrayBuffer());
+            const searchQuery = `${org} official logo brand icon png transparent`;
+            const searchUrl = new URL('https://www.googleapis.com/customsearch/v1');
+            searchUrl.searchParams.set('key', apiKey);
+            searchUrl.searchParams.set('cx', searchEngineId);
+            searchUrl.searchParams.set('q', searchQuery);
+            searchUrl.searchParams.set('searchType', 'image');
+            searchUrl.searchParams.set('num', '5');
+            searchUrl.searchParams.set('imgSize', 'medium'); // Prefer decent quality
 
-                const filename = `${gridPrefix}-${crypto.randomBytes(4).toString('hex')}.png`;
+            const searchResponse = await fetch(searchUrl.toString());
+            const searchData = await searchResponse.json();
 
-                const uploadStream = bucket.openUploadStream(filename, {
-                    metadata: {
-                        contentType: 'image/png',
-                        originalName: `${org} Logo`,
-                        source: 'clearbit',
-                        uploadDate: new Date()
+            if (searchResponse.ok && searchData.items && searchData.items.length > 0) {
+                // Filter and pick the best candidate
+                const candidate = searchData.items.find((item: any) => {
+                    const url = item.link as string;
+                    // Prefer PNGs or SVGs from reputable sources
+                    return /\.(png|svg)$/i.test(url);
+                }) || searchData.items[0];
+
+                const logoUrl = candidate.link;
+                const logoResponse = await fetch(logoUrl);
+
+                if (logoResponse.ok) {
+                    const contentType = logoResponse.headers.get('content-type') || 'image/png';
+
+                    // Only accept images
+                    if (contentType.startsWith('image/')) {
+                        const buffer = Buffer.from(await logoResponse.arrayBuffer());
+                        const urlExt = new URL(logoUrl).pathname.split('.').pop();
+                        const ext = urlExt && urlExt.length < 5 ? `.${urlExt}` : '.png';
+
+                        const filename = `${gridPrefix}-${crypto.randomBytes(4).toString('hex')}${ext}`;
+
+                        const uploadStream = bucket.openUploadStream(filename, {
+                            metadata: {
+                                contentType,
+                                originalName: `${org} Logo`,
+                                source: 'google',
+                                sourceUrl: logoUrl,
+                                uploadDate: new Date()
+                            }
+                        });
+
+                        await new Promise((resolve, reject) => {
+                            uploadStream.on('error', reject);
+                            uploadStream.on('finish', resolve);
+                            uploadStream.end(buffer);
+                        });
+
+                        return NextResponse.json({ url: `/api/images/${filename}`, source: 'google' });
                     }
-                });
-
-                await new Promise((resolve, reject) => {
-                    uploadStream.on('error', reject);
-                    uploadStream.on('finish', resolve);
-                    uploadStream.end(buffer);
-                });
-
-                return NextResponse.json({ url: `/api/images/${filename}`, source: 'clearbit' });
+                }
             }
         } catch (err) {
-            console.error('Clearbit fallback failed:', err);
+            console.error('Google search failed, falling back to Clearbit:', err);
         }
-
-        return NextResponse.json(
-            { error: 'No API key configured. Please add GOOGLE_SEARCH_API_KEY and GOOGLE_SEARCH_ENGINE_ID to Vercel Environment Variables.' },
-            { status: 503 }
-        );
     }
 
-    // Google Custom Search API
-    try {
-        // Refined query to favor official high-quality assets
-        const searchQuery = `${org} official logo icon png`;
-        const searchUrl = new URL('https://www.googleapis.com/customsearch/v1');
-        searchUrl.searchParams.set('key', apiKey);
-        searchUrl.searchParams.set('cx', searchEngineId);
-        searchUrl.searchParams.set('q', searchQuery);
-        searchUrl.searchParams.set('searchType', 'image');
-        searchUrl.searchParams.set('num', '5');
-        searchUrl.searchParams.set('imgType', 'photo');
-        searchUrl.searchParams.set('imgSize', 'medium'); // Prefer decent quality over thumbnails
-
-        const searchResponse = await fetch(searchUrl.toString());
-        const searchData = await searchResponse.json();
-
-        if (!searchResponse.ok) {
-            console.error('Google API Error:', searchData);
-            return NextResponse.json({
-                error: `Google API Error: ${searchData.error?.message || searchResponse.statusText}`
-            }, { status: searchResponse.status });
-        }
-
-        if (!searchData.items || searchData.items.length === 0) {
-            return NextResponse.json({ error: 'No logo found for this organization on Google' }, { status: 404 });
-        }
-
-        // Pick the first suitable result (prefer PNG/SVG)
-        const candidate = searchData.items.find((item: any) => {
-            const url = item.link as string;
-            return /\.(png|svg|jpg|jpeg)$/i.test(url);
-        }) || searchData.items[0];
-
-        const logoUrl = candidate.link;
-
-        // Download the logo
-        const logoResponse = await fetch(logoUrl);
-        if (!logoResponse.ok) {
-            return NextResponse.json({ error: 'Failed to download logo' }, { status: 500 });
-        }
-
-        const buffer = Buffer.from(await logoResponse.arrayBuffer());
-
-        // Determine file extension and content type
-        const urlExt = new URL(logoUrl).pathname.split('.').pop();
-        const ext = urlExt ? `.${urlExt}` : '.png';
-        const contentType = logoResponse.headers.get('content-type') || 'application/octet-stream';
-
-        const filename = `${gridPrefix}-${crypto.randomBytes(4).toString('hex')}${ext}`;
-
-        // Save to GridFS
-        const uploadStream = bucket.openUploadStream(filename, {
-            metadata: {
-                contentType: contentType,
-                originalName: `${org} Logo`,
-                source: 'google',
-                sourceUrl: logoUrl,
-                uploadDate: new Date()
-            }
-        });
-
-        await new Promise((resolve, reject) => {
-            uploadStream.on('error', reject);
-            uploadStream.on('finish', resolve);
-            uploadStream.end(buffer);
-        });
-
-        return NextResponse.json({ url: `/api/images/${filename}`, source: 'google' });
-    } catch (err) {
-        console.error('Logo fetch error:', err);
-        return NextResponse.json(
-            { error: 'Failed to fetch logo', details: err instanceof Error ? err.message : 'Unknown error' },
-            { status: 500 }
-        );
+    // 3. Fallback to Clearbit if Google failed or skipped
+    const clearbitResult = await tryClearbit(org, slug, gridPrefix, bucket);
+    if (clearbitResult) {
+        return NextResponse.json(clearbitResult);
     }
+
+    // 4. Ultimate Failure
+    return NextResponse.json(
+        { error: 'No logo found. Try uploading a custom image or check search API configuration.' },
+        { status: 404 }
+    );
 }

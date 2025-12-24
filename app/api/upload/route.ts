@@ -3,11 +3,12 @@ import { getSession } from '@/lib/auth'
 import fs from 'fs/promises'
 import path from 'path'
 import { getDb } from '@/lib/mongodb'
-import { GridFSBucket } from 'mongodb'
+import { GridFSBucket, ObjectId } from 'mongodb'
 
-// Allow larger uploads and extended timeout
+// Allow larger uploads (internal node limit) and extended timeout
 export const runtime = 'nodejs'
-export const maxDuration = 60 // 60 seconds for large file uploads
+// Increase timeout to 5 minutes to accommodate slow large file merges
+export const maxDuration = 300
 
 export async function POST(request: Request) {
     try {
@@ -17,46 +18,46 @@ export async function POST(request: Request) {
         }
 
         const formData = await request.formData()
+
+        // Check if this is a chunked upload
+        const chunkIndex = formData.get('chunkIndex')
+        const totalChunks = formData.get('totalChunks')
+        const uploadId = formData.get('uploadId')
+
+        if (chunkIndex !== null && totalChunks !== null && uploadId !== null) {
+            return handleChunkedUpload(formData)
+        }
+
+        // --- Standard Single File Upload (Legacy/Small files) ---
         const file = formData.get('file') as File | null
 
         if (!file) {
             return NextResponse.json({ success: false, message: 'No file uploaded' }, { status: 400 })
         }
 
-        // Extended validation for documents
+        // Validation
         const allowedTypes = [
             'image/',
             'application/pdf',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
-            'application/msword', // .doc
-            'application/vnd.ms-powerpoint' // .ppt
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/msword',
+            'application/vnd.ms-powerpoint'
         ]
-
         const isValidType = allowedTypes.some(type => file.type.startsWith(type) || file.type === type)
 
         if (!isValidType) {
-            return NextResponse.json({
-                success: false,
-                message: 'Invalid file type. Allowed: images, PDF, DOCX, PPTX'
-            }, { status: 400 })
-        }
-
-        if (file.size > 25 * 1024 * 1024) {
-            return NextResponse.json({
-                success: false,
-                message: 'File too large. Max 25MB.'
-            }, { status: 400 })
+            return NextResponse.json({ success: false, message: 'Invalid file type.' }, { status: 400 })
         }
 
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
 
-        // Sanitize filename
+        // Sanitize
         const sanitizedName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase()
         const fileName = `${Date.now()}_${sanitizedName}`
 
-        // 1. Save to MongoDB using GridFS (Handles >16MB files)
+        // Save to GridFS
         const db = await getDb()
         const bucket = new GridFSBucket(db, { bucketName: 'images' })
 
@@ -74,27 +75,101 @@ export async function POST(request: Request) {
             uploadStream.end(buffer)
         })
 
-        // The URL will point to our delivery API
-        const publicUrl = `/api/images/${fileName}`
-
-        // 2. Local storage fallback (for dev/local persist)
-        try {
-            const isPdf = file.type === 'application/pdf'
-            const uploadDir = path.join(process.cwd(), 'public', isPdf ? 'CV' : 'images/projects')
-            await fs.mkdir(uploadDir, { recursive: true })
-            const filePath = path.join(uploadDir, fileName)
-            await fs.writeFile(filePath, buffer)
-        } catch (writeError: any) {
-            console.warn('Local FS Upload Failed (expected on Vercel):', writeError.message)
-        }
-
         return NextResponse.json({
             success: true,
             message: `Asset saved to database.`,
-            url: publicUrl
+            url: `/api/images/${fileName}`
         })
-    } catch (error) {
+
+    } catch (error: any) {
         console.error('Upload Error:', error)
-        return NextResponse.json({ success: false, message: 'Failed to upload image' }, { status: 500 })
+        return NextResponse.json({ success: false, message: error.message || 'Failed to upload' }, { status: 500 })
     }
+}
+
+async function handleChunkedUpload(formData: FormData) {
+    const file = formData.get('file') as File
+    const chunkIndex = parseInt(formData.get('chunkIndex') as string)
+    const totalChunks = parseInt(formData.get('totalChunks') as string)
+    const uploadId = formData.get('uploadId') as string
+    const fileName = formData.get('fileName') as string
+    const contentType = formData.get('contentType') as string
+
+    if (!file || isNaN(chunkIndex) || isNaN(totalChunks) || !uploadId) {
+        return NextResponse.json({ success: false, message: 'Missing chunk metadata' }, { status: 400 })
+    }
+
+    const db = await getDb()
+    const tempCollection = db.collection('upload_chunks')
+
+    const buffer = Buffer.from(await file.arrayBuffer())
+
+    // Store chunk
+    await tempCollection.insertOne({
+        uploadId,
+        index: chunkIndex,
+        data: buffer, // Store as binary
+        createdAt: new Date()
+    })
+
+    // If this is the last chunk, merge and finalize
+    if (chunkIndex === totalChunks - 1) {
+        // Verify we have all chunks
+        const count = await tempCollection.countDocuments({ uploadId })
+        // If count mismatch, we can't merge safely
+        if (count !== totalChunks) {
+            // We can wait a bit or fail. For now, fail to be safe.
+            // In a real optimized system we might wait/retry.
+            // But client ensures sequential delivery.
+        }
+
+        // We fetch all chunks sorted by index
+        const chunks = await tempCollection.find({ uploadId }).sort({ index: 1 }).toArray()
+
+        if (chunks.length !== totalChunks) {
+            return NextResponse.json({ success: false, message: 'Chunk mismatch during merge.' }, { status: 400 })
+        }
+
+        const bucket = new GridFSBucket(db, { bucketName: 'images' })
+
+        const sanitizedName = fileName.replace(/[^a-z0-9.]/gi, '_').toLowerCase()
+        const finalFileName = `${Date.now()}_${sanitizedName}`
+
+        const uploadStream = bucket.openUploadStream(finalFileName, {
+            metadata: {
+                contentType,
+                originalName: fileName,
+                uploadDate: new Date()
+            }
+        })
+
+        // Stream chunks to GridFS
+        for (const chunk of chunks) {
+            await new Promise<void>((resolve, reject) => {
+                // Ensure we write buffer
+                if (!uploadStream.write(chunk.data.buffer)) {
+                    uploadStream.once('drain', resolve)
+                } else {
+                    resolve()
+                }
+            })
+        }
+
+        await new Promise((resolve, reject) => {
+            uploadStream.on('error', reject)
+            uploadStream.on('finish', resolve)
+            uploadStream.end()
+        })
+
+        // Cleanup temp chunks
+        await tempCollection.deleteMany({ uploadId })
+
+        return NextResponse.json({
+            success: true,
+            message: 'Upload complete',
+            url: `/api/images/${finalFileName}`
+        })
+    }
+
+    return NextResponse.json({ success: true, message: `Chunk ${chunkIndex} received` })
 }
