@@ -3,6 +3,9 @@ import crypto from 'crypto';
 import { getDb } from '@/lib/mongodb';
 import { GridFSBucket } from 'mongodb';
 
+export const runtime = 'nodejs';
+export const maxDuration = 60; // Allow enough time for search + download + GridFS save
+
 /** Helper – generate a safe filename from the org name */
 function slugify(name: string): string {
     return name

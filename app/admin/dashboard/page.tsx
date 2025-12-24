@@ -1025,7 +1025,7 @@ export default function AdminDashboard() {
                                                                                                 setLocalAchievements(resetUpdated);
                                                                                             }
                                                                                         } catch (err) {
-                                                                                            alert('Failed to fetch logo');
+                                                                                            alert(`Failed to fetch logo: ${err instanceof Error ? err.message : 'Network error'}`);
                                                                                             console.error(err);
                                                                                             const resetUpdated = [...localAchievements];
                                                                                             resetUpdated[idx].orgCustomLogo = undefined;
