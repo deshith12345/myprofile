@@ -622,7 +622,7 @@ export default function AdminDashboard() {
                                                                     });
 
                                                                     try {
-                                                                        const res = await fetch(`/api/fetch-logo?org=${encodeURIComponent(skill.name)}`);
+                                                                        const res = await fetch(`/api/fetch-logo?org=${encodeURIComponent(skill.name)}&t=${Date.now()}`);
                                                                         const data = await res.json();
 
                                                                         if (data.url) {
@@ -1078,7 +1078,7 @@ export default function AdminDashboard() {
                                                                                         });
 
                                                                                         try {
-                                                                                            const res = await fetch(`/api/fetch-logo?org=${encodeURIComponent(org)}`);
+                                                                                            const res = await fetch(`/api/fetch-logo?org=${encodeURIComponent(org)}&t=${Date.now()}`);
                                                                                             const data = await res.json();
 
                                                                                             if (data.url) {

@@ -156,7 +156,13 @@ const WIKIPEDIA_LOGOS: Record<string, string> = {
 };
 
 function slugify(name: string): string {
-    return name.toLowerCase().replace(/[^\w]+/g, '-').replace(/^-+|-+$/g, '');
+    return name.toLowerCase()
+        .replace(/\+/g, 'plus')
+        .replace(/#/g, 'sharp')
+        .replace(/\./g, 'dot')
+        .replace(/[^\w-]+/g, '-') // Replace non-word chars (except -) with -
+        .replace(/--+/g, '-')     // Collapse multiple -
+        .replace(/^-+|-+$/g, ''); // Trim -
 }
 
 async function downloadAndSave(imageUrl: string, name: string, source: string, bucket: GridFSBucket): Promise<string | null> {
