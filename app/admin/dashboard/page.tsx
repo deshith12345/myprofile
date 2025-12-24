@@ -34,6 +34,7 @@ import { achievements as achievementsData } from '@/data/achievements'
 import { badges as badgesData } from '@/data/badges'
 import { Skill, Project, Achievement, Profile, Badge, AchievementCategory } from '@/data/types'
 import { findBrandIcon, findOrganizationIcon } from '@/lib/icon-utils'
+import { uploadFileAction } from '@/app/actions/upload'
 
 
 type Tab = 'profile' | 'skills' | 'projects' | 'achievements' | 'badges'
@@ -58,13 +59,9 @@ function DropZone({ onUpload, currentFile, aspect = 'video', accept = 'image/*',
         formData.append('file', file)
 
         try {
-            const res = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData
-            })
-            const data = await res.json()
+            const data = await uploadFileAction(formData)
             if (data.success) {
-                onUpload(data.url)
+                onUpload(data.url!)
                 // We keep the previewUrl intentionally to avoid 404 flickering while Vercel redeploys
             } else {
                 alert(`Upload failed: ${data.message}`)
