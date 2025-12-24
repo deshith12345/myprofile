@@ -22,7 +22,7 @@ export interface Project {
 export interface Achievement {
   id: string;
   title: string;
-  organization: string;
+  organization?: string;
   date: string;
   description: string;
   icon: string;

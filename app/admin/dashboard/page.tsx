@@ -940,7 +940,7 @@ export default function AdminDashboard() {
                                                             </div>
                                                             {achievement.category !== 'reports' && (
                                                                 <div className="space-y-2">
-                                                                    {!achievement.organization ? (
+                                                                    {!achievement.organization && achievement.organization !== "" ? (
                                                                         <button
                                                                             onClick={() => {
                                                                                 const updated = [...localAchievements]
@@ -958,7 +958,7 @@ export default function AdminDashboard() {
                                                                                 <button
                                                                                     onClick={() => {
                                                                                         const updated = [...localAchievements]
-                                                                                        updated[idx].organization = ""
+                                                                                        updated[idx].organization = undefined
                                                                                         updated[idx].orgIconSlug = undefined
                                                                                         updated[idx].orgIconColor = undefined
                                                                                         setLocalAchievements(updated)
@@ -985,9 +985,9 @@ export default function AdminDashboard() {
                                                                                     <Award className="w-5 h-5 text-gray-400" />
                                                                                 </div>
                                                                                 <input
-                                                                                    value={achievement.organization}
+                                                                                    value={achievement.organization || ''}
                                                                                     onBlur={() => {
-                                                                                        const iconData = findOrganizationIcon(achievement.organization);
+                                                                                        const iconData = findOrganizationIcon(achievement.organization || '');
                                                                                         const updated = [...localAchievements];
                                                                                         updated[idx].orgIconSlug = iconData.slug;
                                                                                         updated[idx].orgIconColor = iconData.color;
@@ -1004,7 +1004,7 @@ export default function AdminDashboard() {
                                                                                 <button
                                                                                     title="Auto-detect Organization Logo"
                                                                                     onClick={() => {
-                                                                                        const iconData = findOrganizationIcon(achievement.organization);
+                                                                                        const iconData = findOrganizationIcon(achievement.organization || '');
                                                                                         const updated = [...localAchievements];
                                                                                         updated[idx].orgIconSlug = iconData.slug;
                                                                                         updated[idx].orgIconColor = iconData.color;

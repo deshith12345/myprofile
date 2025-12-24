@@ -60,7 +60,7 @@ function AchievementLogo({ achievement, Icon }: { achievement: Achievement, Icon
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
 
-  const orgLogo = organizationLogos[achievement.organization]
+  const orgLogo = achievement.organization ? organizationLogos[achievement.organization] : null
   const simpleIconUrl = achievement.orgIconSlug
     ? `https://cdn.simpleicons.org/${achievement.orgIconSlug}/${achievement.orgIconColor || '666666'}`
     : null
@@ -83,7 +83,7 @@ function AchievementLogo({ achievement, Icon }: { achievement: Achievement, Icon
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
           src={imageSrc}
-          alt={achievement.organization}
+          alt={achievement.organization || 'Organization Logo'}
           className={`absolute inset-0 w-full h-full object-contain ${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity`}
           onLoad={() => setImageLoaded(true)}
           onError={() => {
@@ -381,7 +381,10 @@ function ReportViewerModal({ achievement, isOpen, onClose }: { achievement: Achi
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-1">{achievement.title}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{achievement.organization} • {formatDate(achievement.date)}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {achievement.organization ? `${achievement.organization} • ` : ''}
+                {formatDate(achievement.date)}
+              </p>
             </div>
           </div>
           <button
