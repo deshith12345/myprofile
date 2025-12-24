@@ -639,29 +639,38 @@ export default function AdminDashboard() {
                                                             <button
                                                                 title="Auto-fetch Official Logo from Internet"
                                                                 onClick={async () => {
-                                                                    const updated = [...localSkills];
-                                                                    updated[idx].customIconUrl = 'loading';
-                                                                    setLocalSkills(updated);
+                                                                    // Set loading state
+                                                                    setLocalSkills(prev => {
+                                                                        const updated = [...prev];
+                                                                        updated[idx].customIconUrl = 'loading';
+                                                                        return updated;
+                                                                    });
 
                                                                     try {
                                                                         const res = await fetch(`/api/fetch-logo?org=${encodeURIComponent(skill.name)}`);
                                                                         const data = await res.json();
 
                                                                         if (data.url) {
-                                                                            const finalUpdated = [...localSkills];
-                                                                            finalUpdated[idx].customIconUrl = data.url;
-                                                                            setLocalSkills(finalUpdated);
+                                                                            setLocalSkills(prev => {
+                                                                                const updated = [...prev];
+                                                                                updated[idx].customIconUrl = data.url;
+                                                                                return updated;
+                                                                            });
                                                                         } else {
                                                                             alert(`Failed: ${data.error || 'Unknown error'}`);
-                                                                            const resetUpdated = [...localSkills];
-                                                                            resetUpdated[idx].customIconUrl = undefined;
-                                                                            setLocalSkills(resetUpdated);
+                                                                            setLocalSkills(prev => {
+                                                                                const updated = [...prev];
+                                                                                updated[idx].customIconUrl = undefined;
+                                                                                return updated;
+                                                                            });
                                                                         }
                                                                     } catch (err) {
                                                                         alert(`Failed to fetch logo: ${err instanceof Error ? err.message : 'Network error'}`);
-                                                                        const resetUpdated = [...localSkills];
-                                                                        resetUpdated[idx].customIconUrl = undefined;
-                                                                        setLocalSkills(resetUpdated);
+                                                                        setLocalSkills(prev => {
+                                                                            const updated = [...prev];
+                                                                            updated[idx].customIconUrl = undefined;
+                                                                            return updated;
+                                                                        });
                                                                     }
                                                                 }}
                                                                 className="p-1 hover:text-blue-500 transition-colors"
@@ -1092,30 +1101,39 @@ export default function AdminDashboard() {
                                                                                         const org = achievement.organization;
                                                                                         if (!org) return;
 
-                                                                                        const updated = [...localAchievements];
-                                                                                        updated[idx].orgCustomLogo = 'loading';
-                                                                                        setLocalAchievements(updated);
+                                                                                        // Set loading state
+                                                                                        setLocalAchievements(prev => {
+                                                                                            const updated = [...prev];
+                                                                                            updated[idx].orgCustomLogo = 'loading';
+                                                                                            return updated;
+                                                                                        });
 
                                                                                         try {
                                                                                             const res = await fetch(`/api/fetch-logo?org=${encodeURIComponent(org)}`);
                                                                                             const data = await res.json();
 
                                                                                             if (data.url) {
-                                                                                                const finalUpdated = [...localAchievements];
-                                                                                                finalUpdated[idx].orgCustomLogo = data.url;
-                                                                                                setLocalAchievements(finalUpdated);
+                                                                                                setLocalAchievements(prev => {
+                                                                                                    const updated = [...prev];
+                                                                                                    updated[idx].orgCustomLogo = data.url;
+                                                                                                    return updated;
+                                                                                                });
                                                                                             } else {
                                                                                                 alert(`Failed: ${data.error || 'Unknown error'}`);
-                                                                                                const resetUpdated = [...localAchievements];
-                                                                                                resetUpdated[idx].orgCustomLogo = undefined;
-                                                                                                setLocalAchievements(resetUpdated);
+                                                                                                setLocalAchievements(prev => {
+                                                                                                    const updated = [...prev];
+                                                                                                    updated[idx].orgCustomLogo = undefined;
+                                                                                                    return updated;
+                                                                                                });
                                                                                             }
                                                                                         } catch (err) {
                                                                                             alert(`Failed to fetch logo: ${err instanceof Error ? err.message : 'Network error'}`);
                                                                                             console.error(err);
-                                                                                            const resetUpdated = [...localAchievements];
-                                                                                            resetUpdated[idx].orgCustomLogo = undefined;
-                                                                                            setLocalAchievements(resetUpdated);
+                                                                                            setLocalAchievements(prev => {
+                                                                                                const updated = [...prev];
+                                                                                                updated[idx].orgCustomLogo = undefined;
+                                                                                                return updated;
+                                                                                            });
                                                                                         }
                                                                                     }}
                                                                                     className="p-1.5 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"

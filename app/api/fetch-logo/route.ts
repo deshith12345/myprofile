@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getDb } from '@/lib/mongodb';
 import { GridFSBucket } from 'mongodb';
+import { findBrandIcon } from '@/lib/icon-utils';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60; // Allow enough time for search + download + GridFS save
@@ -15,36 +16,75 @@ function slugify(name: string): string {
 }
 
 async function tryClearbit(org: string, slug: string, gridPrefix: string, bucket: GridFSBucket) {
-    // If org looks like a domain, use it. Otherwise, guess {slug}.com
-    const domain = org.includes('.') ? (org.includes('://') ? new URL(org).hostname : org) : `${slug}.com`;
-    const clearbitUrl = `https://logo.clearbit.com/${domain}`;
+    // If org looks like a domain, use it. Otherwise, try multiple common extensions
+    let domainsToCheck: string[] = [];
 
+    if (org.includes('.') && !org.includes(' ')) {
+        const hostname = org.includes('://') ? new URL(org).hostname : org;
+        domainsToCheck.push(hostname);
+    } else {
+        domainsToCheck = [`${slug}.com`, `${slug}.io`, `${slug}.org`, `${slug}.net`, `${slug}.co`];
+    }
+
+    // Try each domain until we find a match
+    for (const domain of domainsToCheck) {
+        const clearbitUrl = `https://logo.clearbit.com/${domain}`;
+        try {
+            const response = await fetch(clearbitUrl, { method: 'HEAD' });
+            if (response.ok) {
+                // Found it! Download and save
+                const logoResponse = await fetch(clearbitUrl);
+                const buffer = Buffer.from(await logoResponse.arrayBuffer());
+
+                const filename = `${gridPrefix}-${crypto.randomBytes(4).toString('hex')}.png`;
+                const uploadStream = bucket.openUploadStream(filename, {
+                    metadata: {
+                        contentType: 'image/png',
+                        originalName: `${org} Logo`,
+                        source: 'clearbit',
+                        sourceUrl: clearbitUrl,
+                        uploadDate: new Date()
+                    }
+                });
+
+                await new Promise((resolve, reject) => {
+                    uploadStream.on('error', reject);
+                    uploadStream.on('finish', resolve);
+                    uploadStream.end(buffer);
+                });
+
+                return { url: `/api/images/${filename}`, source: 'clearbit' };
+            }
+        } catch (err) {
+            // Ignore error and try next domain
+            console.error(`Clearbit fetch failed for ${domain}:`, err);
+        }
+    }
+
+    return null;
+}
+
+async function trySimpleIcons(org: string) {
+    // Check if it matches a known simple icon
     try {
-        const response = await fetch(clearbitUrl, { method: 'HEAD' });
+        const iconData = findBrandIcon(org);
+        // findBrandIcon always returns a slug object, but we want to check if it's a "real" match.
+        // The current implementation returns a guessed slug even if not found in local metadata.
+        // However, we can try to HEAD the CDN url to verify it exists.
+
+        const cdnUrl = `https://cdn.simpleicons.org/${iconData.slug}/${iconData.color || 'default'}`;
+
+        // We verify if this slug actually exists on Simple Icons CDN
+        const response = await fetch(cdnUrl, { method: 'HEAD' });
         if (response.ok) {
-            const logoResponse = await fetch(clearbitUrl);
-            const buffer = Buffer.from(await logoResponse.arrayBuffer());
-
-            const filename = `${gridPrefix}-${crypto.randomBytes(4).toString('hex')}.png`;
-            const uploadStream = bucket.openUploadStream(filename, {
-                metadata: {
-                    contentType: 'image/png',
-                    originalName: `${org} Logo`,
-                    source: 'clearbit',
-                    uploadDate: new Date()
-                }
-            });
-
-            await new Promise((resolve, reject) => {
-                uploadStream.on('error', reject);
-                uploadStream.on('finish', resolve);
-                uploadStream.end(buffer);
-            });
-
-            return { url: `/api/images/${filename}`, source: 'clearbit' };
+            return {
+                url: cdnUrl,
+                source: 'simple-icons',
+                cached: false // We don't cache CDN links in GridFS to save space/bandwidth, frontend renders them directly
+            };
         }
     } catch (err) {
-        console.error('Clearbit fetch failed:', err);
+        console.error('Simple Icons verification failed:', err);
     }
     return null;
 }
@@ -83,8 +123,8 @@ export async function GET(req: NextRequest) {
             searchUrl.searchParams.set('cx', searchEngineId);
             searchUrl.searchParams.set('q', searchQuery);
             searchUrl.searchParams.set('searchType', 'image');
-            searchUrl.searchParams.set('num', '5');
-            searchUrl.searchParams.set('imgSize', 'medium'); // Prefer decent quality
+            searchUrl.searchParams.set('num', '3'); // Reduced from 5 to save quota
+            searchUrl.searchParams.set('imgSize', 'medium');
 
             const searchResponse = await fetch(searchUrl.toString());
             const searchData = await searchResponse.json();
@@ -132,17 +172,23 @@ export async function GET(req: NextRequest) {
                 }
             }
         } catch (err) {
-            console.error('Google search failed, falling back to Clearbit:', err);
+            console.error('Google search failed, falling back to next provider:', err);
         }
     }
 
-    // 3. Fallback to Clearbit if Google failed or skipped
+    // 3. Simple Icons Fallback (Fast & Reliable for tech brands)
+    const simpleIconsResult = await trySimpleIcons(org);
+    if (simpleIconsResult) {
+        return NextResponse.json(simpleIconsResult);
+    }
+
+    // 4. Fallback to Clearbit if Google failed or skipped
     const clearbitResult = await tryClearbit(org, slug, gridPrefix, bucket);
     if (clearbitResult) {
         return NextResponse.json(clearbitResult);
     }
 
-    // 4. Ultimate Failure
+    // 5. Ultimate Failure
     return NextResponse.json(
         { error: 'No logo found. Try uploading a custom image or check search API configuration.' },
         { status: 404 }
