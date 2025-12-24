@@ -4,7 +4,8 @@ import { getDb } from '@/lib/mongodb';
 import { GridFSBucket } from 'mongodb';
 
 export const runtime = 'nodejs';
-export const maxDuration = 30;
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 /**
  * Logo fetching API - Downloads OFFICIAL logos and saves to database
@@ -257,47 +258,53 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const org = searchParams.get('org')?.trim();
 
-    if (!org) {
-        return NextResponse.json({ error: 'Missing org query parameter' }, { status: 400 });
-    }
-
-    const db = await getDb();
-    const bucket = new GridFSBucket(db, { bucketName: 'images' });
-    const prefix = `logo_${slugify(org)}`;
-
-    // 1. Check cache
-    const existing = await bucket.find({ filename: { $regex: new RegExp(`^${prefix}`) } }).toArray();
-    if (existing.length > 0) {
-        return NextResponse.json({ url: `/api/images/${existing[0].filename}`, source: 'cache' });
-    }
-
-    // 2. Check Wikipedia logos (most reliable)
-    const normalized = org.toLowerCase().trim();
-    if (WIKIPEDIA_LOGOS[normalized]) {
-        const savedUrl = await downloadAndSave(WIKIPEDIA_LOGOS[normalized], org, 'wikipedia', bucket);
-        if (savedUrl) {
-            return NextResponse.json({ url: savedUrl, source: 'wikipedia' });
+    try {
+        if (!org) {
+            return NextResponse.json({ error: 'Missing org query parameter' }, { status: 400 });
         }
-    }
 
-    // 3. Try Google Search (with Wikipedia preference)
-    const googleUrl = await tryGoogleSearch(org);
-    if (googleUrl) {
-        const savedUrl = await downloadAndSave(googleUrl, org, 'google', bucket);
-        if (savedUrl) {
-            return NextResponse.json({ url: savedUrl, source: 'google' });
+        const db = await getDb();
+        const bucket = new GridFSBucket(db, { bucketName: 'images' });
+        const prefix = `logo_${slugify(org)}`;
+
+        // 1. Check cache
+        const existing = await bucket.find({ filename: { $regex: new RegExp(`^${prefix}`) } }).toArray();
+        if (existing.length > 0) {
+            return NextResponse.json({ url: `/api/images/${existing[0].filename}`, source: 'cache' });
         }
-    }
 
-    // 4. Try Clearbit
-    const clearbitUrl = await tryClearbit(org);
-    if (clearbitUrl) {
-        const savedUrl = await downloadAndSave(clearbitUrl, org, 'clearbit', bucket);
-        if (savedUrl) {
-            return NextResponse.json({ url: savedUrl, source: 'clearbit' });
+        // 2. Check Wikipedia logos (most reliable)
+        const normalized = org.toLowerCase().trim();
+        if (WIKIPEDIA_LOGOS[normalized]) {
+            const savedUrl = await downloadAndSave(WIKIPEDIA_LOGOS[normalized], org, 'wikipedia', bucket);
+            if (savedUrl) {
+                return NextResponse.json({ url: savedUrl, source: 'wikipedia' });
+            }
         }
-    }
 
-    // 5. Not found
-    return NextResponse.json({ error: `No official logo found for "${org}". Try uploading manually.` }, { status: 404 });
+        // 3. Try Google Search (with Wikipedia preference)
+        const googleUrl = await tryGoogleSearch(org);
+        if (googleUrl) {
+            const savedUrl = await downloadAndSave(googleUrl, org, 'google', bucket);
+            if (savedUrl) {
+                return NextResponse.json({ url: savedUrl, source: 'google' });
+            }
+        }
+
+        // 4. Try Clearbit
+        const clearbitUrl = await tryClearbit(org);
+        if (clearbitUrl) {
+            const savedUrl = await downloadAndSave(clearbitUrl, org, 'clearbit', bucket);
+            if (savedUrl) {
+                return NextResponse.json({ url: savedUrl, source: 'clearbit' });
+            }
+        }
+
+        // 5. Not found
+        return NextResponse.json({ error: `No official logo found for "${org}". Try uploading manually.` }, { status: 404 });
+
+    } catch (error: any) {
+        console.error('Logo Fetch API Error:', error);
+        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    }
 }

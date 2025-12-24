@@ -640,6 +640,7 @@ export default function AdminDashboard() {
                                                                             });
                                                                         }
                                                                     } catch (err) {
+                                                                        console.error('Fetch Logo Error (Skills):', err);
                                                                         alert(`Failed to fetch logo: ${err instanceof Error ? err.message : 'Network error'}`);
                                                                         setLocalSkills(prev => {
                                                                             const updated = [...prev];
@@ -1095,8 +1096,8 @@ export default function AdminDashboard() {
                                                                                                 });
                                                                                             }
                                                                                         } catch (err) {
+                                                                                            console.error('Fetch Logo Error (Achievements):', err);
                                                                                             alert(`Failed to fetch logo: ${err instanceof Error ? err.message : 'Network error'}`);
-                                                                                            console.error(err);
                                                                                             setLocalAchievements(prev => {
                                                                                                 const updated = [...prev];
                                                                                                 updated[idx].orgCustomLogo = undefined;
