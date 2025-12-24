@@ -20,16 +20,14 @@ export async function GET(
             const file = files[0]
             const stream = bucket.openDownloadStreamByName(id)
 
-            // Convert to Web ReadableStream for Next.js
-            const readable = new ReadableStream({
-                start(controller) {
-                    stream.on('data', (chunk) => controller.enqueue(chunk))
-                    stream.on('end', () => controller.close())
-                    stream.on('error', (err) => controller.error(err))
-                }
-            })
+            // Buffer the stream to ensure reliable delivery (Serverless environments can sometimes cut streams)
+            const chunks = []
+            for await (const chunk of stream) {
+                chunks.push(chunk)
+            }
+            const buffer = Buffer.concat(chunks)
 
-            return new NextResponse(readable as any, {
+            return new NextResponse(buffer, {
                 headers: {
                     'Content-Type': (file as any).metadata?.contentType || (file as any).contentType || 'application/octet-stream',
                     'Cache-Control': 'public, max-age=31536000, immutable',
