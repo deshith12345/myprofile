@@ -47,6 +47,7 @@ export interface Skill {
   icon?: string;
   isBrandIcon?: boolean;
   brandColor?: string;
+  customIconUrl?: string; // URL to custom uploaded/fetched logo
 }
 
 export interface SocialLink {

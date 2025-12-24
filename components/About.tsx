@@ -38,7 +38,7 @@ function SkillCard({ skill }: { skill: Skill }) {
   const [currentUrl, setCurrentUrl] = useState<string | null>(null)
 
   const isBrand = skill.isBrandIcon && skill.icon
-  const brandIconUrl = isBrand ? `https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}` : null
+  const brandIconUrl = skill.customIconUrl || (isBrand ? `https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}` : null)
 
   useEffect(() => {
     if (!brandIconUrl) {

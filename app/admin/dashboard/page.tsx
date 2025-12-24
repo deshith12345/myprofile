@@ -539,7 +539,17 @@ export default function AdminDashboard() {
                                             <div className="grid md:grid-cols-4 gap-4 items-center">
                                                 <div className="md:col-span-1 flex items-center gap-4">
                                                     <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden">
-                                                        {skill.isBrandIcon && skill.icon ? (
+                                                        {skill.customIconUrl ? (
+                                                            /* eslint-disable-next-line @next/next/no-img-element */
+                                                            <img
+                                                                src={skill.customIconUrl === 'loading' ? '#' : skill.customIconUrl}
+                                                                alt=""
+                                                                className={`w-full h-full object-contain ${skill.customIconUrl === 'loading' ? 'animate-pulse opacity-20' : ''}`}
+                                                                onError={(e) => {
+                                                                    e.currentTarget.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        ) : skill.isBrandIcon && skill.icon ? (
                                                             /* eslint-disable-next-line @next/next/no-img-element */
                                                             <img
                                                                 src={`https://cdn.simpleicons.org/${skill.icon}/${skill.brandColor || '666666'}`}
@@ -589,6 +599,43 @@ export default function AdminDashboard() {
                                                                 className="p-1 hover:text-primary-500 transition-colors"
                                                             >
                                                                 <Wand2 className="w-3 h-3" />
+                                                            </button>
+                                                            <button
+                                                                title="Auto-fetch Official Logo from Internet"
+                                                                onClick={async () => {
+                                                                    const updated = [...localSkills];
+                                                                    updated[idx].customIconUrl = 'loading';
+                                                                    setLocalSkills(updated);
+
+                                                                    try {
+                                                                        const res = await fetch(`/api/fetch-logo?org=${encodeURIComponent(skill.name)}`);
+                                                                        const data = await res.json();
+
+                                                                        if (data.url) {
+                                                                            const finalUpdated = [...localSkills];
+                                                                            finalUpdated[idx].customIconUrl = data.url;
+                                                                            setLocalSkills(finalUpdated);
+                                                                        } else {
+                                                                            alert(`Failed: ${data.error || 'Unknown error'}`);
+                                                                            const resetUpdated = [...localSkills];
+                                                                            resetUpdated[idx].customIconUrl = undefined;
+                                                                            setLocalSkills(resetUpdated);
+                                                                        }
+                                                                    } catch (err) {
+                                                                        alert(`Failed to fetch logo: ${err instanceof Error ? err.message : 'Network error'}`);
+                                                                        const resetUpdated = [...localSkills];
+                                                                        resetUpdated[idx].customIconUrl = undefined;
+                                                                        setLocalSkills(resetUpdated);
+                                                                    }
+                                                                }}
+                                                                className="p-1 hover:text-blue-500 transition-colors"
+                                                                disabled={skill.customIconUrl === 'loading'}
+                                                            >
+                                                                {skill.customIconUrl === 'loading' ? (
+                                                                    <div className="w-3 h-3 border border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                                                ) : (
+                                                                    <Search className="w-3 h-3" />
+                                                                )}
                                                             </button>
                                                         </div>
                                                     </div>

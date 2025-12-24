@@ -83,7 +83,8 @@ export async function GET(req: NextRequest) {
 
     // Google Custom Search API
     try {
-        const searchQuery = `${org} logo`;
+        // Refined query to favor official high-quality assets
+        const searchQuery = `${org} official logo icon png`;
         const searchUrl = new URL('https://www.googleapis.com/customsearch/v1');
         searchUrl.searchParams.set('key', apiKey);
         searchUrl.searchParams.set('cx', searchEngineId);
@@ -91,6 +92,7 @@ export async function GET(req: NextRequest) {
         searchUrl.searchParams.set('searchType', 'image');
         searchUrl.searchParams.set('num', '5');
         searchUrl.searchParams.set('imgType', 'photo');
+        searchUrl.searchParams.set('imgSize', 'medium'); // Prefer decent quality over thumbnails
 
         const searchResponse = await fetch(searchUrl.toString());
         const searchData = await searchResponse.json();
