@@ -155,8 +155,23 @@ const WIKIPEDIA_LOGOS: Record<string, string> = {
     'owasp': 'https://upload.wikimedia.org/wikipedia/commons/5/5d/OWASP_logo.png',
 };
 
+// Normalization map for common variations to standard keys
+const NAME_MAPPINGS: Record<string, string> = {
+    'java script': 'javascript',
+    'c++ programming': 'cplusplus',
+    'c programming': 'c',
+    'microsoft powershell': 'powershell',
+    'burp suite': 'burpsuite',
+    'kali linux': 'kalilinux',
+    'parrot linux': 'linux', // Fallback
+};
+
 function slugify(name: string): string {
-    return name.toLowerCase()
+    const lower = name.toLowerCase().trim();
+    if (NAME_MAPPINGS[lower]) {
+        return NAME_MAPPINGS[lower];
+    }
+    return lower
         .replace(/\+/g, 'plus')
         .replace(/#/g, 'sharp')
         .replace(/\./g, 'dot')

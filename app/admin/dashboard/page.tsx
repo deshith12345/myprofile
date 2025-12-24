@@ -280,8 +280,10 @@ export default function AdminDashboard() {
 
             setSaveStatus({
                 type: 'success',
-                message: 'All changes have been successfully saved to the database and are now live.',
+                message: 'All changes have been successfully saved to the database. PLEASE REFRESH YOUR HOMEPAGE to see the changes.',
             })
+            // Open homepage in new tab to verify
+            window.open('/', '_blank');
         } catch (err: any) {
             console.error('Save error:', err)
             setSaveStatus({ type: 'error', message: err.message || 'Error during synchronization.' })
@@ -560,19 +562,46 @@ export default function AdminDashboard() {
                             <div className="space-y-8">
                                 <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border border-gray-200 dark:border-gray-700">
                                     <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 ml-2">Weaponry & Arsenal</h4>
-                                    <Button size="sm" onClick={() => {
-                                        const newSkill: Skill = {
-                                            name: 'New Skill',
-                                            category: 'security-tools',
-                                            proficiency: 50,
-                                            icon: 'shield',
-                                            isBrandIcon: false,
-                                            brandColor: undefined
-                                        } as Skill
-                                        setLocalSkills([...localSkills, newSkill])
-                                    }} className="bg-primary-600 hover:bg-primary-500 text-white rounded-xl">
-                                        <Plus className="w-4 h-4 mr-2" /> Unsheathe New Skill
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button size="sm" onClick={async () => {
+                                            const indicesToFetch = localSkills.map((s, i) => !s.customIconUrl ? i : -1).filter(i => i !== -1);
+                                            if (indicesToFetch.length === 0) return alert("All skills already have custom logos!");
+                                            if (!confirm(`Fetch logos for ${indicesToFetch.length} skills?`)) return;
+
+                                            const updated = [...localSkills];
+                                            // Mark loading
+                                            indicesToFetch.forEach(i => updated[i].customIconUrl = 'loading');
+                                            setLocalSkills([...updated]);
+
+                                            for (const idx of indicesToFetch) {
+                                                try {
+                                                    const res = await fetch(`/api/fetch-logo?org=${encodeURIComponent(updated[idx].name)}&t=${Date.now()}`);
+                                                    const data = await res.json();
+                                                    if (data.url) updated[idx].customIconUrl = data.url;
+                                                    else updated[idx].customIconUrl = undefined; // Reset if failed
+                                                } catch (e) {
+                                                    console.error(e);
+                                                    updated[idx].customIconUrl = undefined;
+                                                }
+                                                setLocalSkills([...updated]); // Update progress
+                                            }
+                                        }} className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl">
+                                            <Wand2 className="w-4 h-4 mr-2" /> Auto-Fill Logos
+                                        </Button>
+                                        <Button size="sm" onClick={() => {
+                                            const newSkill: Skill = {
+                                                name: 'New Skill',
+                                                category: 'security-tools',
+                                                proficiency: 50,
+                                                icon: 'shield',
+                                                isBrandIcon: false,
+                                                brandColor: undefined
+                                            } as Skill
+                                            setLocalSkills([...localSkills, newSkill])
+                                        }} className="bg-primary-600 hover:bg-primary-500 text-white rounded-xl">
+                                            <Plus className="w-4 h-4 mr-2" /> Unsheathe New Skill
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 <div className="grid gap-4">
