@@ -124,11 +124,8 @@ async function handleChunkedUpload(formData: FormData) {
         }
 
         // We fetch all chunks sorted by index
-        const chunks = await tempCollection.find({ uploadId }).sort({ index: 1 }).toArray()
-
-        if (chunks.length !== totalChunks) {
-            return NextResponse.json({ success: false, message: 'Chunk mismatch during merge.' }, { status: 400 })
-        }
+        // We fetch all chunks sorted by index
+        const cursor = tempCollection.find({ uploadId }).sort({ index: 1 })
 
         const bucket = new GridFSBucket(db, { bucketName: 'images' })
 
@@ -144,10 +141,13 @@ async function handleChunkedUpload(formData: FormData) {
         })
 
         // Stream chunks to GridFS
-        for (const chunk of chunks) {
+        for await (const chunk of cursor) {
+            // MongoDB Binary wrapper handling. 
+            // If stored as Binary (default), use .buffer. If Buffer, use directly.
+            const dataBuffer = (chunk.data && chunk.data.buffer) ? chunk.data.buffer : chunk.data
+
             await new Promise<void>((resolve, reject) => {
-                // Ensure we write buffer
-                if (!uploadStream.write(chunk.data.buffer)) {
+                if (!uploadStream.write(dataBuffer)) {
                     uploadStream.once('drain', resolve)
                 } else {
                     resolve()

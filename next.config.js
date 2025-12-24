@@ -11,9 +11,8 @@ const nextConfig = {
   poweredByHeader: false,
   experimental: {
     serverActions: {
-      bodySizeLimit: '25mb'
+      bodySizeLimit: '100mb'
     }
   }
-}
 
 module.exports = nextConfig

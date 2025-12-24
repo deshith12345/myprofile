@@ -35,8 +35,8 @@ export async function uploadFileAction(formData: FormData) {
             throw new Error('Invalid file type. Allowed: images, PDF, DOCX, PPTX')
         }
 
-        if (file.size > 25 * 1024 * 1024) {
-            throw new Error('File too large. Max 25MB.')
+        if (file.size > 100 * 1024 * 1024) {
+            throw new Error('File too large. Max 100MB.')
         }
 
         const bytes = await file.arrayBuffer()
