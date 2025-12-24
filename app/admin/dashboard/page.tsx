@@ -21,6 +21,7 @@ import {
     Upload,
     X,
     FileText,
+    Search,
     Wand2
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -1001,6 +1002,48 @@ export default function AdminDashboard() {
                                                                                     placeholder="e.g., CompTIA, Cisco, IBM"
                                                                                     className="flex-1 bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-primary-500 transition-all font-mono"
                                                                                 />
+                                                                                <button
+                                                                                    type="button"
+                                                                                    title="Auto-fetch Organization Logo from Internet"
+                                                                                    onClick={async () => {
+                                                                                        const org = achievement.organization;
+                                                                                        if (!org) return;
+
+                                                                                        const updated = [...localAchievements];
+                                                                                        updated[idx].orgCustomLogo = 'loading';
+                                                                                        setLocalAchievements(updated);
+
+                                                                                        try {
+                                                                                            const res = await fetch(`/api/fetch-logo?org=${encodeURIComponent(org)}`);
+                                                                                            const data = await res.json();
+
+                                                                                            if (data.url) {
+                                                                                                const finalUpdated = [...localAchievements];
+                                                                                                finalUpdated[idx].orgCustomLogo = data.url;
+                                                                                                setLocalAchievements(finalUpdated);
+                                                                                            } else {
+                                                                                                alert(`Failed: ${data.error || 'Unknown error'}`);
+                                                                                                const resetUpdated = [...localAchievements];
+                                                                                                resetUpdated[idx].orgCustomLogo = undefined;
+                                                                                                setLocalAchievements(resetUpdated);
+                                                                                            }
+                                                                                        } catch (err) {
+                                                                                            alert('Failed to fetch logo');
+                                                                                            console.error(err);
+                                                                                            const resetUpdated = [...localAchievements];
+                                                                                            resetUpdated[idx].orgCustomLogo = undefined;
+                                                                                            setLocalAchievements(resetUpdated);
+                                                                                        }
+                                                                                    }}
+                                                                                    className="p-1.5 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                                                                    disabled={achievement.orgCustomLogo === 'loading'}
+                                                                                >
+                                                                                    {achievement.orgCustomLogo === 'loading' ? (
+                                                                                        <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                                                                    ) : (
+                                                                                        <Search className="w-4 h-4" />
+                                                                                    )}
+                                                                                </button>
                                                                                 <button
                                                                                     title="Auto-detect Organization Logo"
                                                                                     onClick={() => {

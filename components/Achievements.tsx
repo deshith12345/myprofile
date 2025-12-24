@@ -60,13 +60,15 @@ function AchievementLogo({ achievement, Icon }: { achievement: Achievement, Icon
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
 
+  // Priority: custom logo > simple icons > hardcoded map
+  const customLogo = achievement.orgCustomLogo
   const orgLogo = achievement.organization ? organizationLogos[achievement.organization] : null
   const simpleIconUrl = achievement.orgIconSlug
     ? `https://cdn.simpleicons.org/${achievement.orgIconSlug}/${achievement.orgIconColor || '666666'}`
     : null
 
   // Determine which image source to use
-  const imageSrc = simpleIconUrl || orgLogo
+  const imageSrc = customLogo || simpleIconUrl || orgLogo
 
   // If no image source at all, just show the icon
   if (!imageSrc) {

@@ -35,6 +35,7 @@ export interface Achievement {
   category: AchievementCategory;
   orgIconSlug?: string;
   orgIconColor?: string;
+  orgCustomLogo?: string; // URL to custom uploaded/fetched logo
 }
 
 export type AchievementCategory = 'award' | 'certification' | 'reports' | 'speaking' | 'event' | 'article';
