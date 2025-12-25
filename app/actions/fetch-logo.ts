@@ -17,13 +17,18 @@ export async function fetchLogoAction(query: string): Promise<{ success: boolean
 
         const data = await res.json()
 
+        if (data.error) {
+            console.error('Google API Error:', data.error)
+            return { success: false, message: `Google API Error: ${data.error.message}` }
+        }
+
         if (data.items && data.items.length > 0) {
             return { success: true, url: data.items[0].link }
         } else {
-            return { success: false, message: 'No logo found' }
+            return { success: false, message: 'No logo found for this query. Try a different name.' }
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching logo:', error)
-        return { success: false, message: 'Failed to fetch logo' }
+        return { success: false, message: `Server Error: ${error.message}` }
     }
 }
