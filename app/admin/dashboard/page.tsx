@@ -1035,7 +1035,7 @@ export default function AdminDashboard() {
                                                                                                 updated[idx].orgCustomLogo = res.url
                                                                                                 setLocalAchievements(updated)
                                                                                             } else {
-                                                                                                alert('Could not find a logo for this organization.')
+                                                                                                alert(res.message || 'Could not find a logo for this organization.')
                                                                                             }
                                                                                         }}
                                                                                         className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
