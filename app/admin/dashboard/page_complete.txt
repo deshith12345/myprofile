@@ -33,6 +33,7 @@ import { projects as projectsData } from '@/data/projects'
 import { achievements as achievementsData } from '@/data/achievements'
 import { badges as badgesData } from '@/data/badges'
 import { Skill, Project, Achievement, Profile, Badge, AchievementCategory } from '@/data/types'
+import { findBrandIcon, findOrganizationIcon } from '@/lib/icon-utils'
 import { uploadFileAction } from '@/app/actions/upload'
 
 
@@ -1122,7 +1123,6 @@ export default function AdminDashboard() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
                                             </Card>
                                         ))}
                                 </div>
