@@ -34,6 +34,7 @@ import { achievements as achievementsData } from '@/data/achievements'
 import { badges as badgesData } from '@/data/badges'
 import { Skill, Project, Achievement, Profile, Badge, AchievementCategory } from '@/data/types'
 import { uploadFileAction } from '@/app/actions/upload'
+import { fetchLogoAction } from '@/app/actions/fetch-logo'
 
 
 type Tab = 'profile' | 'skills' | 'projects' | 'achievements' | 'badges'
@@ -281,7 +282,7 @@ export default function AdminDashboard() {
                 type: 'success',
                 message: 'All changes have been successfully saved to the database. PLEASE REFRESH YOUR HOMEPAGE to see the changes.',
             })
-            window.open('/', '_blank')
+
         } catch (err: any) {
             console.error('Save error:', err)
             setSaveStatus({ type: 'error', message: err.message || 'Error during synchronization.' })
@@ -584,9 +585,9 @@ export default function AdminDashboard() {
                                                         {skill.customIconUrl ? (
                                                             /* eslint-disable-next-line @next/next/no-img-element */
                                                             <img
-                                                                src={skill.customIconUrl === 'loading' ? '#' : skill.customIconUrl}
+                                                                src={skill.customIconUrl === 'loading' ? '/loading-spinner.svg' : skill.customIconUrl}
                                                                 alt=""
-                                                                className={`w-full h-full object-contain ${skill.customIconUrl === 'loading' ? 'animate-pulse opacity-20' : ''}`}
+                                                                className={`w-full h-full object-contain ${skill.customIconUrl === 'loading' ? 'animate-pulse opacity-50' : ''}`}
                                                             />
                                                         ) : (
                                                             <div className="text-gray-400 text-[8px] font-black uppercase text-center leading-tight">No<br />Icon</div>
@@ -604,7 +605,27 @@ export default function AdminDashboard() {
                                                                 }}
                                                                 className="w-full bg-transparent border-none p-0 text-sm font-bold text-gray-900 dark:text-white outline-none focus:ring-0"
                                                             />
+                                                            <button
+                                                                onClick={async () => {
+                                                                    const updated = [...localSkills]
+                                                                    updated[idx].customIconUrl = 'loading'
+                                                                    setLocalSkills(updated)
 
+                                                                    const res = await fetchLogoAction(skill.name)
+                                                                    const finalUpdated = [...localSkills] // Re-read state in case it changed
+                                                                    if (res.success && res.url) {
+                                                                        finalUpdated[idx].customIconUrl = res.url
+                                                                    } else {
+                                                                        alert(res.message || 'Logo not found')
+                                                                        finalUpdated[idx].customIconUrl = undefined
+                                                                    }
+                                                                    setLocalSkills(finalUpdated)
+                                                                }}
+                                                                title="Auto-Fetch Logo"
+                                                                className="p-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
+                                                            >
+                                                                <Wand2 className="w-3 h-3" />
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -987,20 +1008,42 @@ export default function AdminDashboard() {
                                                                             </div>
                                                                             <div className="flex items-center gap-3">
                                                                                 <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 overflow-hidden shrink-0 relative">
-                                                                                    <Award className="w-5 h-5 text-gray-400" />
+                                                                                    {achievement.orgCustomLogo ? (
+                                                                                        /* eslint-disable-next-line @next/next/no-img-element */
+                                                                                        <img src={achievement.orgCustomLogo} alt="" className="w-full h-full object-contain" />
+                                                                                    ) : (
+                                                                                        <Award className="w-5 h-5 text-gray-400" />
+                                                                                    )}
                                                                                 </div>
-                                                                                <input
-                                                                                    value={achievement.organization || ''}
-                                                                                    onChange={(e) => {
-                                                                                        const updated = [...localAchievements]
-                                                                                        updated[idx].organization = e.target.value
-                                                                                        setLocalAchievements(updated)
-                                                                                    }}
-                                                                                    placeholder="e.g., CompTIA, Cisco, IBM"
-                                                                                    className="flex-1 bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-primary-500 transition-all font-mono"
-                                                                                />
-
-
+                                                                                <div className="flex-1 flex gap-2">
+                                                                                    <input
+                                                                                        value={achievement.organization || ''}
+                                                                                        onChange={(e) => {
+                                                                                            const updated = [...localAchievements]
+                                                                                            updated[idx].organization = e.target.value
+                                                                                            setLocalAchievements(updated)
+                                                                                        }}
+                                                                                        placeholder="e.g., CompTIA, Cisco, IBM"
+                                                                                        className="flex-1 bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-primary-500 transition-all font-mono"
+                                                                                    />
+                                                                                    <button
+                                                                                        onClick={async () => {
+                                                                                            if (!achievement.organization) return
+                                                                                            const res = await fetchLogoAction(achievement.organization)
+                                                                                            if (res.success && res.url) {
+                                                                                                const updated = [...localAchievements]
+                                                                                                updated[idx].orgCustomLogo = res.url
+                                                                                                setLocalAchievements(updated)
+                                                                                            } else {
+                                                                                                alert('Could not find a logo for this organization.')
+                                                                                            }
+                                                                                        }}
+                                                                                        className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                                                                                        title="Auto-fetch Organization Logo"
+                                                                                    >
+                                                                                        <Wand2 className="w-4 h-4" />
+                                                                                    </button>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     )}
