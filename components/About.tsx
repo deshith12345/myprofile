@@ -130,8 +130,18 @@ export function About({ skills, profile }: { skills: Skill[], profile: Profile }
           <h2 className="text-4xl md:text-6xl font-black mb-6 text-gray-900 dark:text-white">
             Technical <span className="gradient-text">Mastery</span>
           </h2>
-          <div className="text-lg text-gray-600 dark:text-gray-400 max-w-4xl mx-auto whitespace-pre-line text-center leading-relaxed">
-            {profile.longBio || profile.bio || "Specialized in defensive cybersecurity operations and automated security scripting."}
+          <div className="max-w-4xl mx-auto space-y-6 text-center">
+            {/* Short Summary */}
+            <p className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white leading-relaxed">
+              {profile.bio}
+            </p>
+
+            {/* Executive Summary */}
+            {profile.longBio && (
+              <div className="text-lg text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed">
+                {profile.longBio}
+              </div>
+            )}
           </div>
         </motion.div>
 
