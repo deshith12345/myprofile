@@ -849,7 +849,7 @@ export default function AdminDashboard() {
                                                         <div className="space-y-1">
                                                             <label className="text-[8px] font-black uppercase text-gray-500">Full Mission Details (Long Description)</label>
                                                             <textarea
-                                                                value={project.longDescription}
+                                                                value={project.longDescription || ''}
                                                                 onChange={(e) => {
                                                                     const updated = [...localProjects]
                                                                     updated[idx].longDescription = e.target.value
@@ -864,7 +864,7 @@ export default function AdminDashboard() {
                                                         <div className="space-y-2">
                                                             <label className="text-[8px] font-black uppercase text-gray-500">Tech Stack (Comma Separated)</label>
                                                             <input
-                                                                value={project.technologies.join(', ')}
+                                                                value={(project.technologies || []).join(', ')}
                                                                 onChange={(e) => {
                                                                     const updated = [...localProjects]
                                                                     updated[idx].technologies = e.target.value.split(',').map(t => t.trim()).filter(Boolean)
