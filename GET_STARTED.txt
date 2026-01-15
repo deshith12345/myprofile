@@ -1,0 +1,83 @@
+================================================================================
+                    PORTFOLIO WEBSITE - GET STARTED GUIDE
+================================================================================
+
+QUICK START (3 Steps)
+================================================================================
+
+1. INSTALL NODE.JS
+   → Download from: https://nodejs.org/
+   → Install the LTS version
+   → Restart your terminal after installation
+
+2. OPEN TERMINAL IN PORTFOLIO FOLDER
+   → Navigate to this folder (where package.json is located)
+   → Or right-click here → "Open in Terminal"
+
+3. RUN THESE COMMANDS:
+   npm install          (installs all dependencies)
+   npm run dev         (starts development server)
+
+================================================================================
+
+WHAT TO DO AFTER INSTALLATION
+================================================================================
+
+1. SET UP ENVIRONMENT VARIABLES:
+   - Copy .env.local.example to .env.local
+   - Edit .env.local with your information
+   - Get Resend API key from https://resend.com (for contact form)
+
+2. CUSTOMIZE YOUR CONTENT:
+   - Edit data/profile.ts (your info)
+   - Edit data/projects.ts (your projects)
+   - Edit data/achievements.ts (your achievements)
+   - Edit data/skills.ts (your skills)
+
+3. ADD YOUR ASSETS:
+   - Replace public/profile.jpg with your photo
+   - Add project images to public/images/projects/
+   - Replace public/resume.pdf with your resume
+   - Create public/og-image.jpg (1200x630px)
+
+4. TEST LOCALLY:
+   - Run: npm run dev
+   - Open: http://localhost:3000
+
+5. DEPLOY TO VERCEL:
+   - Push code to GitHub
+   - Import in Vercel dashboard
+   - Add environment variables
+   - Deploy!
+
+================================================================================
+
+HELPFUL FILES
+================================================================================
+
+- README.md              → Complete documentation
+- INSTALLATION_HELP.md   → Detailed installation help
+- QUICK_START.md         → Quick reference guide
+- SETUP.md               → Setup checklist
+- check-setup.ps1        → Run this to check your setup (PowerShell)
+
+================================================================================
+
+NEED HELP?
+================================================================================
+
+If npm install doesn't work:
+- Make sure Node.js is installed: node --version
+- Restart your terminal after installing Node.js
+- Check INSTALLATION_HELP.md for troubleshooting
+
+If you see errors:
+- Check the error message
+- Make sure you're in the portfolio directory
+- Verify Node.js is installed correctly
+
+================================================================================
+
+All files are ready! Just install Node.js and run npm install.
+================================================================================
+
