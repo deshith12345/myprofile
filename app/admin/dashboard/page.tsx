@@ -256,10 +256,17 @@ export default function AdminDashboard() {
         setIsSaving(true)
         setSaveStatus(null)
 
+        // Clean data before saving
+        const cleanedProjects = localProjects.map(p => ({
+            ...p,
+            technologies: p.technologies.map(t => t.trim()).filter(Boolean),
+            highlights: p.highlights.map(h => h.trim()).filter(Boolean)
+        }))
+
         const saves = [
             { type: 'profile', data: localProfile },
             { type: 'skills', data: localSkills },
-            { type: 'projects', data: localProjects },
+            { type: 'projects', data: cleanedProjects },
             { type: 'achievements', data: localAchievements },
             { type: 'badges', data: localBadges },
         ]
@@ -864,10 +871,10 @@ export default function AdminDashboard() {
                                                         <div className="space-y-2">
                                                             <label className="text-[8px] font-black uppercase text-gray-500">Tech Stack (Comma Separated)</label>
                                                             <input
-                                                                value={(project.technologies || []).join(', ')}
+                                                                value={(project.technologies || []).join(',')}
                                                                 onChange={(e) => {
                                                                     const updated = [...localProjects]
-                                                                    updated[idx].technologies = e.target.value.split(',').map(t => t.trim()).filter(Boolean)
+                                                                    updated[idx].technologies = e.target.value.split(',')
                                                                     setLocalProjects(updated)
                                                                 }}
                                                                 className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm font-mono text-primary-500 outline-none focus:border-primary-500 transition-all"
