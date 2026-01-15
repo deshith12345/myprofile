@@ -111,7 +111,7 @@ function SkillCard({ skill }: { skill: Skill }) {
 
 export function About({ skills, profile }: { skills: Skill[], profile: Profile }) {
   const skillsData = skills // Keep consistency with previous naming if needed
-  
+
   return (
     <section id="about" className="py-24 bg-[#F8FAFC] dark:bg-[#030711] relative overflow-hidden">
       {/* Subtle background glow */}
