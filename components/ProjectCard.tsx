@@ -128,7 +128,7 @@ export function ProjectCard({ project, onClick, priority = false }: ProjectCardP
           </h3>
 
           <p className="text-gray-600 dark:text-gray-300 mb-4 flex-1 line-clamp-3">
-            {project.description}
+            {project.longDescription || project.description}
           </p>
 
           {/* Technologies */}
