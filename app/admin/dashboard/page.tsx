@@ -844,19 +844,7 @@ export default function AdminDashboard() {
                                                     </div>
 
                                                     <div className="space-y-4">
-                                                        <div className="space-y-1">
-                                                            <label className="text-[8px] font-black uppercase text-gray-500">Short Mission Brief (Description)</label>
-                                                            <input
-                                                                value={project.description}
-                                                                onChange={(e) => {
-                                                                    const updated = [...localProjects]
-                                                                    updated[idx].description = e.target.value
-                                                                    setLocalProjects(updated)
-                                                                }}
-                                                                className="w-full bg-transparent border-b border-gray-200 dark:border-gray-700 py-2 text-sm text-gray-700 dark:text-gray-300 outline-none focus:border-primary-500 transition-all"
-                                                                placeholder="Brief overview..."
-                                                            />
-                                                        </div>
+
 
                                                         <div className="space-y-1">
                                                             <label className="text-[8px] font-black uppercase text-gray-500">Full Mission Details (Long Description)</label>
